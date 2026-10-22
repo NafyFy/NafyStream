@@ -41,7 +41,7 @@ function playMovie(imdbID) {
     const playerContainer = document.getElementById('player-container');
     document.getElementById('results').innerHTML = '';
     
-    const embedUrl = `https://frembed.bar/embed/movie/?id=${imdbID}`;
+    const embedUrl = `https://frembed.bar/embed/movie/${imdbID}`;
     
     playerContainer.innerHTML = `
         <h2>Bon visionnage !</h2>
