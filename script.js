@@ -47,7 +47,6 @@ async function fetchMovies(url, containerId) {
 
 async function searchMovie() {
     const query = document.getElementById('searchInput').value;
-    const year = document.getElementById('yearInput').value;
     const resultsContainer = document.getElementById('search-results');
     
     if (!query) {
@@ -60,7 +59,6 @@ async function searchMovie() {
     try {
         let apiUrl = `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`;
         
-        if (year) apiUrl += `&primary_release_year=${year}`;
 
         fetchMovies(apiUrl, 'search-results');
     } catch (error) {
