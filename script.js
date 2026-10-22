@@ -1,7 +1,9 @@
-const OMDB_API_KEY = 'aca5581c3c1261367bad7827b83ffee4';
+const TMDB_API_KEY = 'aca5581c3c1261367bad7827b83ffee4'; 
+const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 
+// Fonction pour naviguer entre les onglets
 function showSection(sectionId) {
-    // On cache toutes les sections
     document.getElementById('home-section').style.display = 'none';
     document.getElementById('search-section').style.display = 'none';
     document.getElementById('player-section').style.display = 'none';
@@ -12,40 +14,40 @@ function showSection(sectionId) {
 }
 
 async function loadHomeCategories() {
-    const trendingKeywords = ['Batman', 'Avengers', 'Spider', 'Star Wars', 'Lord of the rings'];
-    const classicKeywords = ['Godfather', 'Matrix', 'Alien', 'Terminator', 'Jurassic', 'Indiana Jones'];
-    
-    const randomTrend = trendingKeywords[Math.floor(Math.random() * trendingKeywords.length)];
-    const randomClassic = classicKeywords[Math.floor(Math.random() * classicKeywords.length)];
+    const urlTendances = `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=fr-FR&page=1`;
+    const urlTop250 = `${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=fr-FR&page=1`;
 
-    fetchCategory(randomTrend, 'trending-results');
-    fetchCategory(randomClassic, 'classic-results');
+    fetchMovies(urlTendances, 'trending-results');
+    fetchMovies(urlTop250, 'classic-results');
 }
 
-async function fetchCategory(keyword, containerId) {
+async function fetchMovies(url, containerId) {
     const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Chargement...</p>';
+    container.innerHTML = '<p style="color:#d4af37;">Chargement...</p>';
     
     try {
-        const response = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(keyword)}&apikey=${OMDB_API_KEY}`);
+        const response = await fetch(url);
         const data = await response.json();
-
-        if (data.Response === "True") {
-            container.innerHTML = '';
-            data.Search.forEach(movie => {
+        
+        container.innerHTML = '';
+        
+        if (data.results && data.results.length > 0) {
+            data.results.forEach(movie => {
                 const movieCard = createMovieCard(movie);
                 container.appendChild(movieCard);
             });
+        } else {
+            container.innerHTML = '<p>Aucun film trouvé.</p>';
         }
     } catch (error) {
-        container.innerHTML = '<p>Erreur de chargement.</p>';
+        container.innerHTML = '<p style="color: red;">Erreur de connexion.</p>';
+        console.error(error);
     }
 }
 
 async function searchMovie() {
     const query = document.getElementById('searchInput').value;
     const year = document.getElementById('yearInput').value;
-    const type = document.getElementById('typeInput').value;
     const resultsContainer = document.getElementById('search-results');
     
     if (!query) {
@@ -53,26 +55,14 @@ async function searchMovie() {
         return;
     }
 
-    resultsContainer.innerHTML = '<p>Recherche en cours...</p>';
+    resultsContainer.innerHTML = '<p style="color:#d4af37;">Recherche en cours...</p>';
 
     try {
-        let apiUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${OMDB_API_KEY}`;
-        if (year) apiUrl += `&y=${year}`;
-        if (type) apiUrl += `&type=${type}`;
+        let apiUrl = `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`;
+        
+        if (year) apiUrl += `&primary_release_year=${year}`;
 
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        resultsContainer.innerHTML = '';
-
-        if (data.Response === "True") {
-            data.Search.forEach(movie => {
-                const movieCard = createMovieCard(movie);
-                resultsContainer.appendChild(movieCard);
-            });
-        } else {
-            resultsContainer.innerHTML = `<p style="color: #d4af37;">${data.Error}</p>`;
-        }
+        fetchMovies(apiUrl, 'search-results');
     } catch (error) {
         resultsContainer.innerHTML = `<p style="color: red;">Erreur de connexion.</p>`;
     }
@@ -81,22 +71,42 @@ async function searchMovie() {
 function createMovieCard(movie) {
     const div = document.createElement('div');
     div.classList.add('movie-card');
+    
+    const posterUrl = movie.poster_path ? `${TMDB_IMAGE_BASE}${movie.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image';
+    
     div.innerHTML = `
-        <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/200x300?text=Pas+d+image'}" alt="${movie.Title}">
-        <h3>${movie.Title}</h3>
+        <img src="${posterUrl}" alt="${movie.title}">
+        <h3>${movie.title}</h3>
     `;
-    div.onclick = () => playMovie(movie.imdbID);
+    
+    div.onclick = () => playMovie(movie.id);
     return div;
 }
 
-function playMovie(imdbID) {
+async function playMovie(tmdbID) {
     showSection('player');
     const playerContainer = document.getElementById('player-container');
-    const embedUrl = `https://frembed.bar/embed/movie/${imdbID}`;
+    playerContainer.innerHTML = '<p style="text-align:center; color:#d4af37; padding-top: 50px;">Préparation de la vidéo...</p>';
     
-    playerContainer.innerHTML = `
-        <iframe src="${embedUrl}" allowfullscreen></iframe>
-    `;
+    try {
+        const response = await fetch(`${TMDB_BASE_URL}/movie/${tmdbID}/external_ids?api_key=${TMDB_API_KEY}`);
+        const data = await response.json();
+        
+        const imdbID = data.imdb_id;
+        
+        if (!imdbID) {
+            playerContainer.innerHTML = '<p style="text-align:center; color:red;">Désolé, ce film n\'a pas de code vidéo disponible.</p>';
+            return;
+        }
+
+        const embedUrl = `https://frembed.bar/embed/movie/${imdbID}`;
+        
+        playerContainer.innerHTML = `
+            <iframe src="${embedUrl}" allowfullscreen></iframe>
+        `;
+    } catch (error) {
+        playerContainer.innerHTML = '<p style="text-align:center; color:red;">Erreur lors du chargement de la vidéo.</p>';
+    }
 }
 
 window.onload = loadHomeCategories;
