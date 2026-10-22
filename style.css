@@ -1,63 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #141414;
-    color: white;
+    font-family: 'VT323', monospace;
+    background-color: #0d0221;
+    color: #00ffea;
     margin: 0;
     padding: 0;
+    text-transform: uppercase;
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 234, 0.07) 2px,
+        rgba(0, 255, 234, 0.07) 4px
+    );
+    
+    animation: flicker 0.15s infinite alternate;
 }
 
 header {
-    background-color: #000;
-    padding: 20px;
+    background-color: #05010f;
+    padding: 30px;
     text-align: center;
+    border-bottom: 4px solid #ff00ff;
+    box-shadow: 0 0 20px #ff00ff;
+}
+
+h1 {
+    color: #ff00ff;
+    text-shadow: 3px 3px 0px #00ffff, -2px -2px 0px #ff00ff;
+    font-size: 4rem;
+    margin: 0 0 20px 0;
+    letter-spacing: 5px;
 }
 
 .search-container input {
-    padding: 10px;
+    padding: 15px;
     width: 300px;
-    border: none;
-    border-radius: 4px;
+    background-color: #000;
+    border: 2px solid #00ffea;
+    color: #00ffea;
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    box-shadow: inset 0 0 10px #00ffea;
+    outline: none;
+}
+
+.search-container input::placeholder {
+    color: rgba(0, 255, 234, 0.5);
 }
 
 .search-container button {
-    padding: 10px 20px;
-    background-color: #e50914;
-    color: white;
-    border: none;
-    border-radius: 4px;
+    padding: 15px 20px;
+    background-color: #ff00ff;
+    color: #fff;
+    border: 2px solid #fff;
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
     cursor: pointer;
-    font-weight: bold;
+    box-shadow: 0 0 10px #ff00ff;
+    transition: all 0.2s;
 }
 
 .search-container button:hover {
-    background-color: #b20710;
+    background-color: #00ffea;
+    border-color: #00ffea;
+    color: #000;
+    box-shadow: 0 0 20px #00ffea, inset 0 0 10px #000;
 }
 
 .results-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    padding: 20px;
+    gap: 30px;
+    padding: 40px 20px;
 }
 
 .movie-card {
-    background-color: #222;
-    border-radius: 8px;
+    background-color: #000;
+    border: 2px solid #ff00ff;
     padding: 10px;
     width: 200px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s;
+    box-shadow: 0 0 15px #ff00ff;
+    transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
 }
 
 .movie-card:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    border-color: #00ffea;
+    box-shadow: 0 0 25px #00ffea;
+    color: #fff;
 }
 
 .movie-card img {
     width: 100%;
-    border-radius: 4px;
+    border: 1px solid #333;
+    filter: contrast(130%) saturate(120%) sepia(20%);
+}
+
+.movie-card h3 {
+    font-size: 1.3rem;
+    margin-top: 15px;
+}
+
+#player-container {
+    text-align: center;
+    padding: 20px;
+}
+
+#player-container h2 {
+    color: #00ffea;
+    text-shadow: 0 0 15px #00ffea;
+    font-size: 2.5rem;
 }
 
 #player-container iframe {
@@ -66,6 +123,34 @@ header {
     height: 562px;
     margin: 20px auto;
     display: block;
-    border: none;
-    border-radius: 8px;
+    border: 8px solid #333;
+    border-radius: 40px 40px 10px 10px;
+    box-shadow: 0 0 40px rgba(0, 255, 234, 0.4), inset 0 0 20px #000;
+    background-color: #000;
+}
+
+#player-container button {
+    background-color: #00ffea;
+    color: #000;
+    border: 2px solid #fff;
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    box-shadow: 0 0 15px #00ffea;
+    transition: all 0.2s;
+}
+
+#player-container button:hover {
+    background-color: #ff00ff;
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 20px #ff00ff;
+}
+
+/* Définition de l'animation de scintillement */
+@keyframes flicker {
+    0% { opacity: 0.97; }
+    5% { opacity: 0.90; }
+    10% { opacity: 0.95; }
+    15% { opacity: 1; }
+    100% { opacity: 1; }
 }
