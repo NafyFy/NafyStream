@@ -1,163 +1,201 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #1a1a1a;
-    background-image: radial-gradient(circle, #2a2a2a 0%, #111 100%);
-    color: #f4eadd; 
+    font-family: 'Playfair Display', serif;
+    background-color: #1a0000;
     margin: 0;
     padding: 0;
+    color: #f3e5ab; 
 }
 
-h1, h2, h3, .logo {
-    font-family: 'Playfair Display', serif;
-    color: #d4af37; 
+.theater-curtains {
+    min-height: 100vh;
+    background: 
+        linear-gradient(rgba(42, 2, 2, 0.8), rgba(15, 0, 0, 0.9)), 
+        repeating-linear-gradient(
+            to right,
+            #4a0404,
+            #4a0404 30px,
+            #330202 35px,
+            #4a0404 40px
+        );
+    background-attachment: fixed;
 }
 
 header {
-    background-color: #0d0d0d;
-    padding: 15px 40px;
+    padding: 30px 20px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    border-bottom: 2px solid #8b0000; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+    gap: 20px;
 }
 
-.logo {
-    font-size: 2rem;
-    font-weight: bold;
+.marquee-board {
+    background-color: #111;
+    border: 8px solid #8b6508;
+    border-style: ridge;
+    padding: 10px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.8), inset 0 0 20px #000;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 800px;
 }
 
-nav button {
-    background: none;
-    border: none;
-    color: #f4eadd;
-    font-size: 1.1rem;
-    margin-left: 20px;
+.marquee-lights {
+    border: 6px dotted #ffeb3b;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 0 15px #ffeb3b, inset 0 0 15px #ffeb3b; 
+    animation: pulse-lights 2s infinite alternate;
+}
+
+h1 {
+    font-family: 'Limelight', cursive;
+    color: #ffeb3b;
+    font-size: 3rem;
+    margin: 0;
+    text-shadow: 2px 2px 0px #000, 0 0 20px #ffb300;
+    letter-spacing: 3px;
+}
+
+.ticket-nav button {
+    background-color: #d4af37; 
+    color: #111;
+    border: 2px dashed #111;
+    padding: 10px 25px;
+    margin: 0 10px;
+    font-family: 'Limelight', cursive;
+    font-size: 1.2rem;
     cursor: pointer;
-    font-family: 'Roboto', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: color 0.3s;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s, background-color 0.2s;
 }
 
-nav button:hover {
-    color: #d4af37;
+.ticket-nav button:hover {
+    transform: scale(1.05) rotate(-2deg);
+    background-color: #f3e5ab;
 }
 
 main {
-    padding: 30px;
+    padding: 20px 40px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
+.section-title {
+    font-family: 'Limelight', cursive;
+    color: #d4af37;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 10px;
+    margin-top: 40px;
+    text-shadow: 1px 1px 5px #000;
+}
+
 .results-grid {
     display: flex;
-    gap: 20px;
-    padding-bottom: 20px;
+    gap: 25px;
+    padding: 20px 10px;
 }
 
 .horizontal-scroll {
     overflow-x: auto;
     flex-wrap: nowrap;
     scrollbar-width: thin;
-    scrollbar-color: #8b0000 #1a1a1a;
+    scrollbar-color: #d4af37 #222;
 }
 
 .movie-card {
-    background-color: #222;
-    border: 1px solid #333;
-    border-radius: 4px;
+    background-color: #0a0a0a;
+    border: 5px solid #8b6508;
+    border-style: ridge;
+    padding: 8px;
     min-width: 180px;
     width: 180px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-    padding-bottom: 10px;
+    transition: transform 0.4s;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.7);
 }
 
 .movie-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(212, 175, 55, 0.2);
+    transform: translateY(-10px) scale(1.02);
     border-color: #d4af37;
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
 }
 
 .movie-card img {
     width: 100%;
     height: 270px;
     object-fit: cover;
-    border-radius: 4px 4px 0 0;
-    filter: sepia(15%); 
+    filter: sepia(30%) contrast(110%);
 }
 
 .movie-card h3 {
     font-size: 1rem;
-    margin: 10px 5px 0 5px;
-    color: #f4eadd;
+    margin: 10px 0 0 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #f3e5ab;
 }
 
-/* Section Recherche */
+/* SECTION RECHERCHE */
 .search-box {
-    background-color: #222;
+    background-color: rgba(20, 5, 5, 0.8);
+    border: 2px solid #8b6508;
     padding: 30px;
-    border-radius: 8px;
-    border-left: 4px solid #8b0000;
-    margin-bottom: 30px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.9);
 }
 
-.filters {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.filters input, .filters select {
-    padding: 12px;
-    background-color: #111;
-    border: 1px solid #444;
-    color: #fff;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.filters button {
-    padding: 12px 25px;
-    background-color: #8b0000;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
+.filters input {
+    padding: 10px;
+    background-color: #f3e5ab;
+    border: 2px inset #8b6508;
+    color: #333;
+    font-family: 'Playfair Display', serif;
     font-weight: bold;
 }
 
-.filters button:hover {
-    background-color: #a30000;
-}
-
-#search-results {
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* Lecteur */
-.back-btn {
-    background: transparent;
-    color: #d4af37;
-    border: 1px solid #d4af37;
+.filters button {
     padding: 10px 20px;
+    background-color: #8b6508;
+    color: #fff;
+    border: 2px outset #d4af37;
+    font-family: 'Limelight', cursive;
     cursor: pointer;
-    margin-bottom: 20px;
-    border-radius: 4px;
+}
+
+.filters button:hover {
+    background-color: #d4af37;
+    color: #111;
+}
+
+.screen-frame {
+    background-color: #000;
+    padding: 30px;
+    border: 15px solid #111;
+    border-radius: 10px;
+    box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 20px rgba(212, 175, 55, 0.2);
+    position: relative;
 }
 
 #player-container iframe {
     width: 100%;
     height: 600px;
     border: none;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    box-shadow: 0 0 30px rgba(255,255,255,0.1);
+}
+
+.back-btn {
+    background: #111;
+    color: #d4af37;
+    border: 1px solid #d4af37;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-family: 'Limelight', cursive;
+}
+
+@keyframes pulse-lights {
+    0% { box-shadow: 0 0 10px #ffeb3b, inset 0 0 10px #ffeb3b; }
+    100% { box-shadow: 0 0 25px #ffb300, inset 0 0 25px #ffb300; border-color: #fff; }
 }
