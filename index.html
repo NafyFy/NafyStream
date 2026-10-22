@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nafy Streaming</title>
+    <title>CinéPalace - Théâtre Rétro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Limelight&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
@@ -15,21 +15,24 @@
                     <h1>🌟 Nafy Streaming 🌟</h1>
                 </div>
             </div>
-            <nav class="ticket-nav">
-                <button onclick="showSection('home')">🎟️ Programmation</button>
-                <button onclick="showSection('search')">🔍 Archives</button>
+            <nav class="elegant-nav">
+                <button onclick="showSection('home')">Programmation</button>
+                <button onclick="showSection('search')">Archives</button>
             </nav>
         </header>
 
         <main>
+            <!-- SECTION ACCUEIL -->
             <section id="home-section" class="active-section">
                 <h2 class="section-title">À l'affiche aujourd'hui</h2>
-                <div id="trending-results" class="results-grid horizontal-scroll"></div>
+                <!-- Les carrousels sont remplacés par des grilles automatiques -->
+                <div id="trending-results" class="results-grid"></div>
 
                 <h2 class="section-title">Chefs-d'œuvre restaurés</h2>
-                <div id="classic-results" class="results-grid horizontal-scroll"></div>
+                <div id="classic-results" class="results-grid"></div>
             </section>
 
+            <!-- SECTION RECHERCHE -->
             <section id="search-section" style="display: none;">
                 <div class="search-box">
                     <h2>Fouiller les archives</h2>
@@ -42,6 +45,7 @@
                 <div id="search-results" class="results-grid"></div>
             </section>
 
+            <!-- SECTION LECTEUR VIDÉO -->
             <section id="player-section" style="display: none;">
                 <button class="back-btn" onclick="showSection('home')">← Retour au Hall</button>
                 <div class="screen-frame">
