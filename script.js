@@ -1,4 +1,4 @@
-const OMDB_API_KEY = 'e0cf604e';
+const OMDB_API_KEY = 'aca5581c3c1261367bad7827b83ffee4';
 
 function showSection(sectionId) {
     // On cache toutes les sections
