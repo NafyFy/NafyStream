@@ -1,156 +1,163 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
 body {
-    font-family: 'VT323', monospace;
-    background-color: #0d0221;
-    color: #00ffea;
+    font-family: 'Roboto', sans-serif;
+    background-color: #1a1a1a;
+    background-image: radial-gradient(circle, #2a2a2a 0%, #111 100%);
+    color: #f4eadd; 
     margin: 0;
     padding: 0;
-    text-transform: uppercase;
-    background-image: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 255, 234, 0.07) 2px,
-        rgba(0, 255, 234, 0.07) 4px
-    );
-    
-    animation: flicker 0.15s infinite alternate;
+}
+
+h1, h2, h3, .logo {
+    font-family: 'Playfair Display', serif;
+    color: #d4af37; 
 }
 
 header {
-    background-color: #05010f;
-    padding: 30px;
-    text-align: center;
-    border-bottom: 4px solid #ff00ff;
-    box-shadow: 0 0 20px #ff00ff;
+    background-color: #0d0d0d;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #8b0000; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.7);
 }
 
-h1 {
-    color: #ff00ff;
-    text-shadow: 3px 3px 0px #00ffff, -2px -2px 0px #ff00ff;
-    font-size: 4rem;
-    margin: 0 0 20px 0;
-    letter-spacing: 5px;
+.logo {
+    font-size: 2rem;
+    font-weight: bold;
 }
 
-.search-container input {
-    padding: 15px;
-    width: 300px;
-    background-color: #000;
-    border: 2px solid #00ffea;
-    color: #00ffea;
-    font-family: 'VT323', monospace;
-    font-size: 1.5rem;
-    box-shadow: inset 0 0 10px #00ffea;
-    outline: none;
-}
-
-.search-container input::placeholder {
-    color: rgba(0, 255, 234, 0.5);
-}
-
-.search-container button {
-    padding: 15px 20px;
-    background-color: #ff00ff;
-    color: #fff;
-    border: 2px solid #fff;
-    font-family: 'VT323', monospace;
-    font-size: 1.5rem;
+nav button {
+    background: none;
+    border: none;
+    color: #f4eadd;
+    font-size: 1.1rem;
+    margin-left: 20px;
     cursor: pointer;
-    box-shadow: 0 0 10px #ff00ff;
-    transition: all 0.2s;
+    font-family: 'Roboto', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s;
 }
 
-.search-container button:hover {
-    background-color: #00ffea;
-    border-color: #00ffea;
-    color: #000;
-    box-shadow: 0 0 20px #00ffea, inset 0 0 10px #000;
+nav button:hover {
+    color: #d4af37;
+}
+
+main {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .results-grid {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    padding: 40px 20px;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+.horizontal-scroll {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: #8b0000 #1a1a1a;
 }
 
 .movie-card {
-    background-color: #000;
-    border: 2px solid #ff00ff;
-    padding: 10px;
-    width: 200px;
+    background-color: #222;
+    border: 1px solid #333;
+    border-radius: 4px;
+    min-width: 180px;
+    width: 180px;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 0 15px #ff00ff;
-    transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    padding-bottom: 10px;
 }
 
 .movie-card:hover {
-    transform: scale(1.1);
-    border-color: #00ffea;
-    box-shadow: 0 0 25px #00ffea;
-    color: #fff;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
 }
 
 .movie-card img {
     width: 100%;
-    border: 1px solid #333;
-    filter: contrast(130%) saturate(120%) sepia(20%);
+    height: 270px;
+    object-fit: cover;
+    border-radius: 4px 4px 0 0;
+    filter: sepia(15%); 
 }
 
 .movie-card h3 {
-    font-size: 1.3rem;
-    margin-top: 15px;
+    font-size: 1rem;
+    margin: 10px 5px 0 5px;
+    color: #f4eadd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-#player-container {
-    text-align: center;
-    padding: 20px;
+/* Section Recherche */
+.search-box {
+    background-color: #222;
+    padding: 30px;
+    border-radius: 8px;
+    border-left: 4px solid #8b0000;
+    margin-bottom: 30px;
 }
 
-#player-container h2 {
-    color: #00ffea;
-    text-shadow: 0 0 15px #00ffea;
-    font-size: 2.5rem;
+.filters {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filters input, .filters select {
+    padding: 12px;
+    background-color: #111;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.filters button {
+    padding: 12px 25px;
+    background-color: #8b0000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.filters button:hover {
+    background-color: #a30000;
+}
+
+#search-results {
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Lecteur */
+.back-btn {
+    background: transparent;
+    color: #d4af37;
+    border: 1px solid #d4af37;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    border-radius: 4px;
 }
 
 #player-container iframe {
     width: 100%;
-    max-width: 1000px;
-    height: 562px;
-    margin: 20px auto;
-    display: block;
-    border: 8px solid #333;
-    border-radius: 40px 40px 10px 10px;
-    box-shadow: 0 0 40px rgba(0, 255, 234, 0.4), inset 0 0 20px #000;
-    background-color: #000;
-}
-
-#player-container button {
-    background-color: #00ffea;
-    color: #000;
-    border: 2px solid #fff;
-    font-family: 'VT323', monospace;
-    font-size: 1.5rem;
-    box-shadow: 0 0 15px #00ffea;
-    transition: all 0.2s;
-}
-
-#player-container button:hover {
-    background-color: #ff00ff;
-    border-color: #fff;
-    color: #fff;
-    box-shadow: 0 0 20px #ff00ff;
-}
-
-/* Définition de l'animation de scintillement */
-@keyframes flicker {
-    0% { opacity: 0.97; }
-    5% { opacity: 0.90; }
-    10% { opacity: 0.95; }
-    15% { opacity: 1; }
-    100% { opacity: 1; }
+    height: 600px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }

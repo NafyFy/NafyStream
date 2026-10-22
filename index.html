@@ -3,24 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Site de Streaming</title>
+    <title>Nafy Streaming</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>StrrStrrrStrrream</h1>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Rechercher un film (ex: Inception)...">
-            <button onclick="searchMovie()">Rechercher</button>
-        </div>
+        <div class="logo">Nafy Stream</div>
+        <nav>
+            <button onclick="showSection('home')">Accueil</button>
+            <button onclick="showSection('search')">Recherche Avancée</button>
+        </nav>
     </header>
 
     <main>
-        <!-- C'est ici que le lecteur vidéo apparaîtra -->
-        <div id="player-container"></div>
-        
-        <!-- C'est ici que les résultats de recherche apparaîtront -->
-        <div id="results" class="results-grid"></div>
+        <section id="home-section" class="active-section">
+            <h2>🔥 Tendances du moment</h2>
+            <div id="trending-results" class="results-grid horizontal-scroll"></div>
+
+            <h2>🎬 Classiques Incontournables</h2>
+            <div id="classic-results" class="results-grid horizontal-scroll"></div>
+        </section>
+
+        <section id="search-section" style="display: none;">
+            <div class="search-box">
+                <h2>Trouver une pépite</h2>
+                <div class="filters">
+                    <input type="text" id="searchInput" placeholder="Titre du film...">
+                    <input type="number" id="yearInput" placeholder="Année (ex: 1994)">
+                    <select id="typeInput">
+                        <option value="">Tout (Films & Séries)</option>
+                        <option value="movie">Film uniquement</option>
+                        <option value="series">Série uniquement</option>
+                    </select>
+                    <button onclick="searchMovie()">Chercher</button>
+                </div>
+            </div>
+            <div id="search-results" class="results-grid"></div>
+        </section>
+
+        <section id="player-section" style="display: none;">
+            <button class="back-btn" onclick="showSection('home')">← Retour</button>
+            <div id="player-container"></div>
+        </section>
     </main>
 
     <script src="script.js"></script>
