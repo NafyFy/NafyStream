@@ -82,20 +82,22 @@ function createMovieCard(movie) {
 }
 
 let currentImdbId = '';
+let currentTmdbId = '';
 
 async function playMovie(tmdbID) {
     showSection('player');
     const playerContainer = document.getElementById('player-container');
-    playerContainer.innerHTML = '<p style="text-align:center; color:#d4af37; padding-top: 50px;">Préparation de la pellicule...</p>';
+    playerContainer.innerHTML = '<p style="text-align:center; color:#d4af37; padding-top: 50px;">Préparation de la vidéo...</p>';
     
     try {
         const response = await fetch(`${TMDB_BASE_URL}/movie/${tmdbID}/external_ids?api_key=${TMDB_API_KEY}`);
         const data = await response.json();
         
+        currentTmdbId = tmdbID;
         currentImdbId = data.imdb_id;
         
-        if (!currentImdbId) {
-            playerContainer.innerHTML = '<p style="text-align:center; color:red;">Désolé, ce film n\'a pas de pellicule disponible.</p>';
+        if (!currentImdbId && !currentTmdbId) {
+            playerContainer.innerHTML = '<p style="text-align:center; color:red;">Désolé, ce film n\'a pas de code vidéo disponible.</p>';
             return;
         }
 
@@ -106,8 +108,6 @@ async function playMovie(tmdbID) {
 }
 
 function changeServer(serverName) {
-    if (!currentImdbId) return;
-    
     const playerContainer = document.getElementById('player-container');
     let embedUrl = '';
     
@@ -116,11 +116,19 @@ function changeServer(serverName) {
     document.getElementById(`btn-${serverName}`).classList.add('active');
     
     if (serverName === 'frembed') {
+        if (!currentImdbId) {
+            playerContainer.innerHTML = '<p style="text-align:center; color:red;">Source indisponible.</p>';
+            return;
+        }
         embedUrl = `https://frembed.bar/embed/movie/${currentImdbId}`;
     } else if (serverName === 'moviez') {
-        embedUrl = `https://api.moviez.ac/${currentImdbId}`;
+        if (!currentTmdbId) {
+            playerContainer.innerHTML = '<p style="text-align:center; color:red;">Source indisponible.</p>';
+            return;
+        }
+        embedUrl = `https://api.moviez.ac/${currentTmdbId}`;
     }
     
-    playerContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+    playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" referrerpolicy="origin" allowfullscreen></iframe>`;
 }
 window.onload = loadHomeCategories;
