@@ -44,6 +44,12 @@
             <!-- SECTION LECTEUR VIDÉO -->
             <section id="player-section" style="display: none;">
                 <button class="back-btn" onclick="showSection('home')"> <-- Retour</button>
+
+            <div class="server-selector" style="text-align: center; margin-bottom: 20px;">
+                <button id="btn-frembed" class="server-btn" onclick="changeServer('frembed')">Projecteur 1 (Frembed)</button>
+                <button id="btn-moviez" class="server-btn" onclick="changeServer('moviez')">Projecteur 2 (Moviez)</button>
+            </div>
+
                 <div class="screen-frame">
                     <div id="player-container"></div>
                 </div>
