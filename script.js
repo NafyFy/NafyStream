@@ -118,7 +118,7 @@ function changeServer(serverName) {
     if (serverName === 'frembed') {
         embedUrl = `https://frembed.bar/embed/movie/${currentImdbId}`;
     } else if (serverName === 'moviez') {
-        embedUrl = `https://api.moviez.ac/embed/${currentImdbId}`;
+        embedUrl = `https://api.moviez.ac/${currentImdbId}`;
     }
     
     playerContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
