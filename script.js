@@ -1,6 +1,6 @@
 /**
  * NAFY STREAM — Architecture Moderne & Fluide
- * Intégration TMDB API & Multi-serveurs de streaming
+ * Intégration TMDB API, Multi-serveurs de streaming & Routage URL robuste (anti-refresh bug)
  */
 
 const TMDB_API_KEY = 'aca5581c3c1261367bad7827b83ffee4';
@@ -8,10 +8,12 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 const TMDB_BACKDROP_BASE = 'https://image.tmdb.org/t/p/original';
 
-// ÉTAT DE L'APPLICATION
+// ÉTAT GLOBAL DE L'APPLICATION
 const state = {
     currentSection: 'home',
     previousSection: 'home',
+    isRouting: false,
+    homeLoaded: false,
     
     // Lecteur actuel
     player: {
@@ -21,11 +23,11 @@ const state = {
         title: '',
         season: 1,
         episode: 1,
-        server: 'moviez',
+        server: localStorage.getItem('nafy_preferred_server') || 'moviez',
         details: null
     },
 
-    // Modal actuel
+    // Modal d'informations actif
     activeModalItem: null,
 
     // Catalogue & Pagination
@@ -51,7 +53,7 @@ const state = {
     watchlist: []
 };
 
-// Genre Maps TMDB (Films & Séries)
+// Dictionnaire des genres TMDB (Films & Séries)
 const GENRE_MAP = {
     28: 'Action', 12: 'Aventure', 16: 'Animation', 35: 'Comédie',
     80: 'Crime', 99: 'Documentaire', 18: 'Drame', 10751: 'Famille',
@@ -64,16 +66,26 @@ const GENRE_MAP = {
 };
 
 /* ========================================================
-   INITIALISATION
+   INITIALISATION & ROUTAGE DE L'APPLICATION
    ======================================================== */
 document.addEventListener('DOMContentLoaded', () => {
     initWatchlist();
     setupEventListeners();
+
+    // Pré-charge l'accueil en arrière-plan
     loadHomePage();
+
+    // Écoute les changements d'historique (Boutons Précédent/Suivant du navigateur)
+    window.addEventListener('hashchange', () => {
+        handleRoute();
+    });
+
+    // Démarre sur la vue correspondant à l'URL actuelle (RÈGLE LE PROBLÈME DU REFRESH)
+    handleRoute();
 });
 
 function setupEventListeners() {
-    // Barre de recherche globale
+    // Barre de recherche globale (desktop)
     const searchInput = document.getElementById('globalSearchInput');
     const mobileSearchInput = document.getElementById('mobileSearchInput');
     const clearBtn = document.getElementById('clearSearchBtn');
@@ -97,12 +109,12 @@ function setupEventListeners() {
             searchInput.value = '';
             clearBtn.style.display = 'none';
             if (state.currentSection === 'search') {
-                navigateTo(state.previousSection || 'home');
+                returnFromSearch();
             }
         });
     }
 
-    // Fermeture modal avec Échap
+    // Fermeture du modal avec la touche Échap
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeInfoModal();
@@ -110,19 +122,77 @@ function setupEventListeners() {
     });
 }
 
+/**
+ * Routeur principal analysant le hash URL (#...)
+ * Permet de conserver l'état exact lors du rechargement de page (F5 / Refresh)
+ */
+function handleRoute() {
+    const rawHash = window.location.hash.replace(/^#\/?/, '').trim();
+
+    if (!rawHash || rawHash === 'home') {
+        navigateTo('home', false);
+        return;
+    }
+
+    const parts = rawHash.split('/');
+    const mainRoute = parts[0];
+
+    if (mainRoute === 'watch') {
+        const mediaType = parts[1] || 'movie';
+        const id = parts[2];
+        const season = parseInt(parts[3] || '1', 10);
+        const episode = parseInt(parts[4] || '1', 10);
+
+        if (id) {
+            playMedia(id, mediaType, season, episode, false);
+            return;
+        }
+    } else if (mainRoute === 'genre') {
+        const genreId = parseInt(parts[1], 10);
+        const genreName = decodeURIComponent(parts[2] || '');
+        if (!isNaN(genreId)) {
+            filterByGenre(genreId, null, genreName, false);
+            return;
+        }
+    } else if (mainRoute === 'search') {
+        const query = decodeURIComponent(parts.slice(1).join('/') || '');
+        if (query) {
+            const searchInput = document.getElementById('globalSearchInput');
+            if (searchInput) searchInput.value = query;
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
+            if (mobileSearchInput) mobileSearchInput.value = query;
+            executeSearch(query, false);
+            return;
+        }
+    } else if (['movies', 'series', 'trending', 'watchlist'].includes(mainRoute)) {
+        navigateTo(mainRoute, false);
+        return;
+    }
+
+    // Par défaut : Accueil
+    navigateTo('home', false);
+}
+
 /* ========================================================
    NAVIGATION ENTRE SECTIONS
    ======================================================== */
-function navigateTo(sectionId, updateHistory = true) {
-    if (state.currentSection !== sectionId) {
+function navigateTo(sectionId, updateHash = true) {
+    if (state.currentSection !== sectionId && state.currentSection !== 'player') {
         state.previousSection = state.currentSection;
     }
     state.currentSection = sectionId;
 
+    // Met à jour l'URL sans recharger la page
+    if (updateHash) {
+        if (window.location.hash !== `#${sectionId}`) {
+            window.location.hash = sectionId;
+        }
+    }
+
     // Masque toutes les sections
     document.querySelectorAll('.view-section').forEach(sec => sec.style.display = 'none');
     
-    // Mise à jour de la classe active sur les liens nav
+    // Met à jour la classe active sur les liens de navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         if (link.dataset.target === sectionId) {
             link.classList.add('active');
@@ -156,11 +226,17 @@ function navigateTo(sectionId, updateHistory = true) {
 }
 
 function returnFromPlayer() {
-    // Arrête le flux vidéo lors du retour
+    // Coupe le flux vidéo
     const container = document.getElementById('player-container');
     if (container) container.innerHTML = '';
     
-    navigateTo(state.previousSection === 'player' ? 'home' : (state.previousSection || 'home'));
+    const target = (state.previousSection && state.previousSection !== 'player') ? state.previousSection : 'home';
+    navigateTo(target, true);
+}
+
+function returnFromSearch() {
+    const target = (state.previousSection && state.previousSection !== 'search') ? state.previousSection : 'home';
+    navigateTo(target, true);
 }
 
 function toggleMobileSearch() {
@@ -175,6 +251,9 @@ function toggleMobileSearch() {
    GESTION DE L'ACCUEIL & DES CARROUSELS
    ======================================================== */
 async function loadHomePage() {
+    if (state.homeLoaded) return;
+    state.homeLoaded = true;
+
     // 1. Hero Banner
     loadHeroBanner();
 
@@ -366,13 +445,19 @@ function handleCardBookmark(btn, id) {
 /* ========================================================
    FILTRE PAR GENRE
    ======================================================== */
-function filterByGenre(genreId, pillElement, genreName = '') {
+function filterByGenre(genreId, pillElement, genreName = '', updateHash = true) {
     document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
-    pillElement.classList.add('active');
+    
+    if (pillElement) {
+        pillElement.classList.add('active');
+    } else if (genreId) {
+        const matching = Array.from(document.querySelectorAll('.genre-pill')).find(p => p.textContent.trim().toLowerCase() === genreName.toLowerCase());
+        if (matching) matching.classList.add('active');
+    }
 
     if (genreId === null) {
         // Retour à l'accueil standard
-        if (state.currentSection !== 'home') navigateTo('home');
+        navigateTo('home', true);
         return;
     }
 
@@ -381,7 +466,11 @@ function filterByGenre(genreId, pillElement, genreName = '') {
     state.browse.genreName = genreName;
     state.browse.page = 1;
 
-    navigateTo('movies');
+    if (updateHash) {
+        window.location.hash = `genre/${genreId}/${encodeURIComponent(genreName)}`;
+    }
+
+    navigateTo('movies', false);
     loadCatalogView('genre', `Genre : ${genreName}`);
 }
 
@@ -483,18 +572,22 @@ function handleSearchInput(query) {
     if (!query || query.trim().length === 0) return;
 
     state.search.debounceTimer = setTimeout(() => {
-        executeSearch(query.trim());
+        executeSearch(query.trim(), true);
     }, 350);
 }
 
 function handleSearchSubmit(query) {
     if (!query || query.trim().length === 0) return;
-    executeSearch(query.trim());
+    executeSearch(query.trim(), true);
 }
 
-async function executeSearch(query) {
+async function executeSearch(query, updateHash = true) {
     state.search.query = query;
-    navigateTo('search');
+    
+    if (updateHash) {
+        window.location.hash = `search/${encodeURIComponent(query)}`;
+    }
+    navigateTo('search', false);
 
     document.getElementById('searchQueryLabel').textContent = `"${query}"`;
     const countLabel = document.getElementById('searchResultsCount');
@@ -641,7 +734,7 @@ async function openInfoModal(id, mediaType = 'movie') {
         const playBtn = document.getElementById('modalPlayBtn');
         playBtn.onclick = () => {
             closeInfoModal();
-            playMedia(id, mediaType, data);
+            playMedia(id, mediaType, 1, 1, true);
         };
 
         // Bouton Ma Liste
@@ -674,13 +767,18 @@ function closeModalOnBackdrop(e) {
 /* ========================================================
    LECTEUR VIDÉO AVANCÉ & GESTION MULTI-SERVEURS
    ======================================================== */
-async function playMedia(id, mediaType = 'movie', preloadedData = null) {
+async function playMedia(id, mediaType = 'movie', season = 1, episode = 1, updateHash = true) {
     state.player.tmdbId = id;
     state.player.mediaType = mediaType;
-    state.player.season = 1;
-    state.player.episode = 1;
+    state.player.season = parseInt(season, 10) || 1;
+    state.player.episode = parseInt(episode, 10) || 1;
 
-    navigateTo('player');
+    // Met à jour l'URL avec les paramètres du média
+    if (updateHash) {
+        updatePlayerUrlHash();
+    }
+
+    navigateTo('player', false);
 
     // Panneau de contrôle Séries TV
     const tvControls = document.getElementById('tv-controls-panel');
@@ -757,7 +855,7 @@ async function playMedia(id, mediaType = 'movie', preloadedData = null) {
         // Recommandations similaires
         renderSimilarCarousel(data.similar ? data.similar.results : []);
 
-        // Lance la lecture sur le serveur actif (défaut : Moviez)
+        // Lance la lecture sur le serveur actif (sauvegardé ou défaut)
         changeServer(state.player.server);
 
     } catch (err) {
@@ -767,12 +865,26 @@ async function playMedia(id, mediaType = 'movie', preloadedData = null) {
     }
 }
 
+/**
+ * Met à jour le hash URL lors de la lecture pour préserver l'état exact au refresh
+ */
+function updatePlayerUrlHash() {
+    const { tmdbId, mediaType, season, episode } = state.player;
+    if (!tmdbId) return;
+    const newHash = mediaType === 'tv'
+        ? `watch/tv/${tmdbId}/${season}/${episode}`
+        : `watch/movie/${tmdbId}`;
+    
+    if (window.location.hash !== `#${newHash}`) {
+        history.replaceState(null, '', `#${newHash}`);
+    }
+}
+
 // Configuration des saisons pour une série
 function setupSeasonSelector(seasons) {
     const seasonSelect = document.getElementById('seasonSelect');
     seasonSelect.innerHTML = '';
 
-    // Filtre les saisons régulières (exclut souvent les bonus Saison 0 si souhaité ou les inclut)
     const validSeasons = seasons.filter(s => s.season_number > 0);
     const listToUse = validSeasons.length > 0 ? validSeasons : seasons;
 
@@ -783,7 +895,14 @@ function setupSeasonSelector(seasons) {
         seasonSelect.appendChild(option);
     });
 
-    state.player.season = listToUse.length > 0 ? listToUse[0].season_number : 1;
+    // Si une saison spécifique était passée dans l'URL (ex: refresh d'une URL de série)
+    const targetSeason = state.player.season;
+    if (targetSeason && listToUse.some(s => s.season_number === targetSeason)) {
+        seasonSelect.value = targetSeason;
+    } else {
+        state.player.season = listToUse.length > 0 ? listToUse[0].season_number : 1;
+    }
+
     loadEpisodesForSeason(state.player.season);
 }
 
@@ -791,6 +910,7 @@ async function onSeasonChange() {
     const seasonSelect = document.getElementById('seasonSelect');
     state.player.season = parseInt(seasonSelect.value, 10);
     state.player.episode = 1;
+    updatePlayerUrlHash();
     await loadEpisodesForSeason(state.player.season);
     changeServer(state.player.server);
 }
@@ -818,12 +938,13 @@ async function loadEpisodesForSeason(seasonNumber) {
                     document.querySelectorAll('.episode-chip').forEach(c => c.classList.remove('active'));
                     chip.classList.add('active');
                     state.player.episode = ep.episode_number;
+                    updatePlayerUrlHash();
                     changeServer(state.player.server);
                 };
                 container.appendChild(chip);
             });
         } else {
-            // Mode de secours si TMDB n'a pas le détail des épisodes
+            // Mode de secours si TMDB n'a pas le détail individuel des épisodes
             label.textContent = `Saison ${seasonNumber} :`;
             for (let i = 1; i <= 24; i++) {
                 const chip = document.createElement('button');
@@ -833,6 +954,7 @@ async function loadEpisodesForSeason(seasonNumber) {
                     document.querySelectorAll('.episode-chip').forEach(c => c.classList.remove('active'));
                     chip.classList.add('active');
                     state.player.episode = i;
+                    updatePlayerUrlHash();
                     changeServer(state.player.server);
                 };
                 container.appendChild(chip);
@@ -846,6 +968,10 @@ async function loadEpisodesForSeason(seasonNumber) {
 // Changement de serveur de streaming avec gestion multi-serveurs HD
 function changeServer(serverName) {
     state.player.server = serverName;
+    try {
+        localStorage.setItem('nafy_preferred_server', serverName);
+    } catch (e) {}
+
     const { tmdbId, imdbId, mediaType, season, episode } = state.player;
 
     if (!tmdbId) return;
@@ -859,7 +985,7 @@ function changeServer(serverName) {
     container.innerHTML = `
         <div class="player-loader">
             <div class="spinner"></div>
-            <p>Connexion au ${serverName.toUpperCase()}...</p>
+            <p>Connexion au serveur ${serverName.toUpperCase()}...</p>
         </div>
     `;
 
@@ -892,7 +1018,7 @@ function changeServer(serverName) {
         }
     }
 
-    // Injection propre de l'iframe après un court délai pour fluidité
+    // Injection propre de l'iframe après un court délai
     setTimeout(() => {
         container.innerHTML = `
             <iframe 
@@ -1061,9 +1187,8 @@ function shareCurrentMedia() {
             url: window.location.href
         }).catch(() => {});
     } else {
-        // Fallback copie dans le presse-papier
         navigator.clipboard.writeText(window.location.href).then(() => {
-            showToast("Lien copié dans le presse-papier !", "fa-link");
+            showToast("Lien de lecture copié !", "fa-link");
         }).catch(() => {
             showToast("Lien prêt à être partagé", "fa-share-nodes");
         });
