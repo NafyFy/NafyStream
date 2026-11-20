@@ -1,0 +1,81 @@
+/* ========================================================
+   NAFY STREAM — DESIGN SYSTEM & THÈMES (VARIABLES CSS)
+   ======================================================== */
+
+:root {
+    /* Palette sombre premium */
+    --bg-base: #090a0f;
+    --bg-surface: #12141c;
+    --bg-card: #181b26;
+    --bg-card-hover: #202434;
+    --bg-elevated: #262a3a;
+    --bg-glass: rgba(18, 20, 28, 0.82);
+    --bg-glass-strong: rgba(14, 16, 24, 0.94);
+
+    /* Thème actif (Défaut : Rouge Cinéma) */
+    --primary: #e50914;
+    --primary-hover: #f40612;
+    --primary-glow: rgba(229, 9, 20, 0.45);
+    --primary-light: rgba(229, 9, 20, 0.15);
+
+    /* Accents secondaires */
+    --accent-gold: #f5c518;
+    --accent-gold-glow: rgba(245, 197, 24, 0.35);
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+
+    /* Typographie */
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --text-inverse: #090a0f;
+
+    /* Bordures & Ombres */
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-light: rgba(255, 255, 255, 0.16);
+    --border-focus: var(--primary);
+    
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-full: 9999px;
+
+    --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    --shadow-card: 0 10px 24px -4px rgba(0, 0, 0, 0.6);
+    --shadow-hover: 0 18px 36px -6px rgba(0, 0, 0, 0.8), 0 0 24px var(--primary-glow);
+    --shadow-modal: 0 25px 60px -10px rgba(0, 0, 0, 0.95);
+
+    --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-slow: all 0.4s ease;
+}
+
+/* THÈMES DE COULEURS SÉLECTIONNABLES PAR L'UTILISATEUR */
+[data-theme="blue"] {
+    --primary: #0ea5e9;
+    --primary-hover: #38bdf8;
+    --primary-glow: rgba(14, 165, 233, 0.45);
+    --primary-light: rgba(14, 165, 233, 0.15);
+}
+
+[data-theme="gold"] {
+    --primary: #eab308;
+    --primary-hover: #facc15;
+    --primary-glow: rgba(234, 179, 8, 0.45);
+    --primary-light: rgba(234, 179, 8, 0.15);
+}
+
+[data-theme="purple"] {
+    --primary: #8b5cf6;
+    --primary-hover: #a78bfa;
+    --primary-glow: rgba(139, 92, 246, 0.45);
+    --primary-light: rgba(139, 92, 246, 0.15);
+}
+
+[data-theme="green"] {
+    --primary: #10b981;
+    --primary-hover: #34d399;
+    --primary-glow: rgba(16, 185, 129, 0.45);
+    --primary-light: rgba(16, 185, 129, 0.15);
+}
