@@ -3,62 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nafy Stream</title>
+    <title>Nafy Stream — Films & Séries en Streaming HD</title>
+    <meta name="description" content="Découvrez les meilleurs films et séries en streaming haute définition sur Nafy Stream. Catalogue mis à jour quotidiennement.">
+    
+    <!-- Polices modernes & Icônes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Limelight&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
-    <div class="theater-curtains">
-        <header>
-            <div class="marquee-board">
-                <div class="marquee-lights">
-                    <h1>Nafy Streaming </h1>
-                </div>
+
+    <!-- NAVIGATION PRINCIPALE (HEADER MODERNE) -->
+    <header id="main-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="#" class="brand-logo" onclick="navigateTo('home'); return false;">
+                    <span class="logo-icon"><i class="fa-solid fa-play"></i></span>
+                    <span class="logo-text">NAFY<span class="logo-accent">STREAM</span></span>
+                </a>
+                
+                <nav class="main-nav">
+                    <button class="nav-link active" data-target="home" onclick="navigateTo('home')">
+                        <i class="fa-solid fa-house"></i> Accueil
+                    </button>
+                    <button class="nav-link" data-target="movies" onclick="navigateTo('movies')">
+                        <i class="fa-solid fa-film"></i> Films
+                    </button>
+                    <button class="nav-link" data-target="series" onclick="navigateTo('series')">
+                        <i class="fa-solid fa-tv"></i> Séries
+                    </button>
+                    <button class="nav-link" data-target="trending" onclick="navigateTo('trending')">
+                        <i class="fa-solid fa-fire-flame-curved"></i> Tendances
+                    </button>
+                    <button class="nav-link" data-target="watchlist" onclick="navigateTo('watchlist')">
+                        <i class="fa-solid fa-bookmark"></i> Ma Liste
+                        <span id="watchlist-badge" class="badge-count">0</span>
+                    </button>
+                </nav>
             </div>
-            <nav class="elegant-nav">
-                <button onclick="showSection('home')">Programmation</button>
-                <button onclick="showSection('search')">Archives</button>
-            </nav>
-        </header>
 
-        <main>
-            <!-- SECTION ACCUEIL -->
-            <section id="home-section" class="active-section">
-                <h2 class="section-title">À l'affiche</h2>
-                <div id="trending-results" class="results-grid"></div>
-            </section>
+            <div class="nav-right">
+                <div class="search-bar-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Rechercher un film, une série..." autocomplete="off">
+                    <button id="clearSearchBtn" class="clear-search-btn" title="Effacer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <button class="mobile-search-toggle" onclick="toggleMobileSearch()" title="Recherche">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
 
-            <!-- SECTION RECHERCHE -->
-            <section id="search-section" style="display: none;">
-                <div class="search-box">
-                    <h2>Tu veux regarder quoi mon quoicouskibidi ?</h2>
-                    <div class="filters">
-                        <input type="text" id="searchInput" placeholder="Titre du film...">
-                        <button onclick="searchMovie()">Vas chercher</button>
+        <!-- Barre de recherche mobile déroulante -->
+        <div id="mobileSearchDrawer" class="mobile-search-drawer">
+            <div class="search-bar-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="mobileSearchInput" placeholder="Rechercher un film, une série..." autocomplete="off">
+                <button class="clear-search-btn" onclick="toggleMobileSearch()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <!-- ================= SECTION ACCUEIL ================= -->
+        <section id="home-section" class="view-section active">
+            
+            <!-- HERO BANNER DYNAMIQUE -->
+            <div id="hero-banner" class="hero-banner">
+                <div class="hero-backdrop" id="heroBackdrop"></div>
+                <div class="hero-gradient-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-badges">
+                        <span class="hero-badge highlight"><i class="fa-solid fa-bolt"></i> À LA UNE</span>
+                        <span id="heroTypeBadge" class="hero-badge type">FILM</span>
+                        <span id="heroRatingBadge" class="hero-badge rating"><i class="fa-solid fa-star"></i> 8.5</span>
+                        <span id="heroYearBadge" class="hero-badge year">2026</span>
+                    </div>
+                    <h1 id="heroTitle" class="hero-title">Chargement des nouveautés...</h1>
+                    <div id="heroGenres" class="hero-genres"></div>
+                    <p id="heroOverview" class="hero-overview">Sélection des meilleurs titres en haute définition.</p>
+                    <div class="hero-actions">
+                        <button id="heroPlayBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-play"></i> Regarder maintenant
+                        </button>
+                        <button id="heroInfoBtn" class="btn btn-secondary">
+                            <i class="fa-solid fa-circle-info"></i> Plus d'infos
+                        </button>
+                        <button id="heroBookmarkBtn" class="btn btn-icon" title="Ajouter à ma liste">
+                            <i class="fa-regular fa-bookmark"></i>
+                        </button>
                     </div>
                 </div>
-                <div id="search-results" class="results-grid"></div>
-            </section>
-
-            <!-- SECTION LECTEUR VIDÉO -->
-            <section id="player-section" style="display: none;">
-                <button class="back-btn" onclick="showSection('home')"> <-- Retour</button>
-
-            <div class="server-selector" style="text-align: center; margin-bottom: 20px;">
-                <button id="btn-frembed" class="server-btn" onclick="changeServer('frembed')">Projecteur 1 (Frembed)</button>
-                <button id="btn-moviez" class="server-btn active" onclick="changeServer('moviez')">Projecteur 2 (Moviez)</button>
             </div>
 
-            <div id="tv-controls" style="display: none; text-align: center; margin-bottom: 20px; color: #d4af37; font-family: 'Limelight', cursive;">
-                <label style="margin-right: 15px;">Saison : <input type="number" id="seasonInput" value="1" min="1" onchange="updateEpisode()" style="width: 60px; background: #111; color: #f3e5ab; border: 1px solid #d4af37; padding: 5px; text-align: center;"></label>
-                <label>Épisode : <input type="number" id="episodeInput" value="1" min="1" onchange="updateEpisode()" style="width: 60px; background: #111; color: #f3e5ab; border: 1px solid #d4af37; padding: 5px; text-align: center;"></label>
+            <!-- BARRE DE FILTRES RAPIDES PAR GENRE -->
+            <div class="genre-pill-bar">
+                <span class="genre-bar-label"><i class="fa-solid fa-sliders"></i> Genres :</span>
+                <div class="genre-pill-scroll" id="genrePillContainer">
+                    <button class="genre-pill active" onclick="filterByGenre(null, this)">Tous</button>
+                    <button class="genre-pill" onclick="filterByGenre(28, this, 'Action')">Action</button>
+                    <button class="genre-pill" onclick="filterByGenre(12, this, 'Aventure')">Aventure</button>
+                    <button class="genre-pill" onclick="filterByGenre(35, this, 'Comédie')">Comédie</button>
+                    <button class="genre-pill" onclick="filterByGenre(18, this, 'Drame')">Drame</button>
+                    <button class="genre-pill" onclick="filterByGenre(878, this, 'Sci-Fi')">Science-Fiction</button>
+                    <button class="genre-pill" onclick="filterByGenre(53, this, 'Thriller')">Thriller</button>
+                    <button class="genre-pill" onclick="filterByGenre(27, this, 'Horreur')">Horreur</button>
+                    <button class="genre-pill" onclick="filterByGenre(16, this, 'Animation')">Animation</button>
+                    <button class="genre-pill" onclick="filterByGenre(14, this, 'Fantastique')">Fantastique</button>
+                </div>
             </div>
 
-            <div class="screen-frame">
-                <div id="player-container"></div>
+            <!-- CONTENEUR DES RANGÉES (CARROUSELS) -->
+            <div class="rows-container">
+                <!-- Rangée 1 : Tendances -->
+                <div class="media-row">
+                    <div class="row-header">
+                        <h2 class="row-title"><i class="fa-solid fa-fire-flame-curved row-icon"></i> Tendances de la semaine</h2>
+                        <button class="see-all-btn" onclick="navigateTo('trending')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="carousel-wrapper">
+                        <button class="carousel-nav prev" onclick="scrollCarousel('trending-carousel', -1)" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="trending-carousel" class="media-carousel"></div>
+                        <button class="carousel-nav next" onclick="scrollCarousel('trending-carousel', 1)" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Rangée 2 : Films populaires -->
+                <div class="media-row">
+                    <div class="row-header">
+                        <h2 class="row-title"><i class="fa-solid fa-film row-icon"></i> Films populaires</h2>
+                        <button class="see-all-btn" onclick="navigateTo('movies')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="carousel-wrapper">
+                        <button class="carousel-nav prev" onclick="scrollCarousel('movies-carousel', -1)" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="movies-carousel" class="media-carousel"></div>
+                        <button class="carousel-nav next" onclick="scrollCarousel('movies-carousel', 1)" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Rangée 3 : Séries TV populaires -->
+                <div class="media-row">
+                    <div class="row-header">
+                        <h2 class="row-title"><i class="fa-solid fa-tv row-icon"></i> Séries du moment</h2>
+                        <button class="see-all-btn" onclick="navigateTo('series')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="carousel-wrapper">
+                        <button class="carousel-nav prev" onclick="scrollCarousel('series-carousel', -1)" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="series-carousel" class="media-carousel"></div>
+                        <button class="carousel-nav next" onclick="scrollCarousel('series-carousel', 1)" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Rangée 4 : Mieux notés -->
+                <div class="media-row">
+                    <div class="row-header">
+                        <h2 class="row-title"><i class="fa-solid fa-star row-icon gold"></i> Les chefs-d'œuvre les mieux notés</h2>
+                        <button class="see-all-btn" onclick="loadCatalogView('top_rated', 'Films les mieux notés')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="carousel-wrapper">
+                        <button class="carousel-nav prev" onclick="scrollCarousel('toprated-carousel', -1)" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="toprated-carousel" class="media-carousel"></div>
+                        <button class="carousel-nav next" onclick="scrollCarousel('toprated-carousel', 1)" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
             </div>
-            </section>
+        </section>
+
+        <!-- ================= SECTION CATALOGUE & EXPLORATION ================= -->
+        <section id="browse-section" class="view-section" style="display: none;">
+            <div class="section-page-header">
+                <div class="page-title-box">
+                    <h1 id="browseTitle" class="section-title">Catalogue</h1>
+                    <p id="browseSubtitle" class="section-subtitle">Explorez les films et séries disponibles</p>
+                </div>
+                <div class="browse-controls">
+                    <select id="browseSortSelect" onchange="onSortChange()">
+                        <option value="popularity.desc">Plus populaires</option>
+                        <option value="vote_average.desc">Mieux notés</option>
+                        <option value="primary_release_date.desc">Plus récents</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grille de résultats -->
+            <div id="browseGrid" class="media-grid"></div>
+
+            <div class="pagination-wrapper">
+                <button id="loadMoreBtn" class="btn btn-secondary" onclick="loadMoreBrowse()">
+                    <i class="fa-solid fa-spinner fa-spin loading-icon" style="display:none;"></i> Charger plus de titres
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= SECTION MA LISTE ================= -->
+        <section id="watchlist-section" class="view-section" style="display: none;">
+            <div class="section-page-header">
+                <div>
+                    <h1 class="section-title"><i class="fa-solid fa-bookmark gold"></i> Ma Liste</h1>
+                    <p class="section-subtitle">Vos films et séries enregistrés pour plus tard</p>
+                </div>
+                <button class="btn btn-sm btn-ghost" onclick="clearWatchlist()" id="clearWatchlistBtn">
+                    <i class="fa-regular fa-trash-can"></i> Vider la liste
+                </button>
+            </div>
+            
+            <div id="watchlistGrid" class="media-grid"></div>
+
+            <div id="emptyWatchlist" class="empty-state" style="display:none;">
+                <div class="empty-icon"><i class="fa-regular fa-bookmark"></i></div>
+                <h3>Votre liste est vide</h3>
+                <p>Cliquez sur l'icône de signet <i class="fa-regular fa-bookmark"></i> sur une affiche pour enregistrer des films et séries ici.</p>
+                <button class="btn btn-primary" onclick="navigateTo('home')">Découvrir des nouveautés</button>
+            </div>
+        </section>
+
+        <!-- ================= SECTION RÉSULTATS DE RECHERCHE ================= -->
+        <section id="search-section" class="view-section" style="display: none;">
+            <div class="section-page-header">
+                <div>
+                    <h1 class="section-title">Résultats pour <span id="searchQueryLabel" class="query-highlight"></span></h1>
+                    <p id="searchResultsCount" class="section-subtitle">0 résultat trouvé</p>
+                </div>
+                <div class="search-filter-tabs">
+                    <button class="filter-tab active" data-filter="all" onclick="filterSearchResults('all')">Tous</button>
+                    <button class="filter-tab" data-filter="movie" onclick="filterSearchResults('movie')">Films</button>
+                    <button class="filter-tab" data-filter="tv" onclick="filterSearchResults('tv')">Séries</button>
+                </div>
+            </div>
+            <div id="searchResultsGrid" class="media-grid"></div>
+        </section>
+
+        <!-- ================= SECTION LECTEUR VIDÉO ================= -->
+        <section id="player-section" class="view-section" style="display: none;">
+            <!-- Barre de navigation du lecteur -->
+            <div class="player-top-bar">
+                <button class="btn-back" onclick="returnFromPlayer()">
+                    <i class="fa-solid fa-arrow-left"></i> Retour
+                </button>
+                <div class="player-title-info">
+                    <span id="playerMediaBadge" class="badge-mini">FILM</span>
+                    <h2 id="playerMediaTitle">Titre du film</h2>
+                    <span id="playerMediaYear" class="meta-year">2026</span>
+                </div>
+                <div class="player-top-actions">
+                    <button id="playerBookmarkBtn" class="btn btn-icon btn-sm" title="Ajouter à ma liste">
+                        <i class="fa-regular fa-bookmark"></i>
+                    </button>
+                    <button class="btn btn-icon btn-sm" onclick="shareCurrentMedia()" title="Partager le lien">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Serveurs / Sources de streaming -->
+            <div class="player-server-panel">
+                <div class="server-label">
+                    <i class="fa-solid fa-server"></i> Serveur :
+                </div>
+                <div class="server-buttons">
+                    <button id="btn-moviez" class="server-btn active" onclick="changeServer('moviez')">
+                        <i class="fa-solid fa-circle-play"></i> Serveur 1 (Moviez - Rapide)
+                    </button>
+                    <button id="btn-frembed" class="server-btn" onclick="changeServer('frembed')">
+                        <i class="fa-solid fa-play"></i> Serveur 2 (Frembed)
+                    </button>
+                    <button id="btn-vidlink" class="server-btn" onclick="changeServer('vidlink')">
+                        <i class="fa-solid fa-bolt"></i> Serveur 3 (VidLink HD)
+                    </button>
+                    <button id="btn-multiembed" class="server-btn" onclick="changeServer('multiembed')">
+                        <i class="fa-solid fa-globe"></i> Serveur 4 (MultiEmbed)
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONTROLES SÉRIES (SAISONS & ÉPISODES INTELLIGENTS) -->
+            <div id="tv-controls-panel" class="tv-controls-panel" style="display: none;">
+                <div class="season-row">
+                    <label for="seasonSelect"><i class="fa-solid fa-list-ol"></i> Saison :</label>
+                    <select id="seasonSelect" onchange="onSeasonChange()"></select>
+                </div>
+                <div class="episodes-scroller-box">
+                    <div class="episodes-header">
+                        <span id="episodesCountLabel">Épisodes disponibles :</span>
+                    </div>
+                    <div id="episodesContainer" class="episodes-chip-grid"></div>
+                </div>
+            </div>
+
+            <!-- CADRE DU LECTEUR VIDÉO (RATIO CINÉMA 16:9) -->
+            <div class="player-theater-wrapper">
+                <div class="screen-container">
+                    <div id="player-container" class="player-iframe-box">
+                        <div class="player-loader">
+                            <div class="spinner"></div>
+                            <p>Initialisation du flux vidéo...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="player-hint-bar">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span><strong>Conseil de lecture :</strong> Si une source ne démarre pas ou tourne en boucle, sélectionnez un autre serveur ci-dessus. Nous recommandons un navigateur moderne et un bloqueur de fenêtres intempestives.</span>
+                </div>
+            </div>
+
+            <!-- DÉTAILS DU CONTENU CI-DESSOUS -->
+            <div class="player-details-card">
+                <div class="player-details-left">
+                    <img id="playerPosterImg" src="" alt="Affiche" class="player-detail-poster">
+                </div>
+                <div class="player-details-main">
+                    <div class="player-badges-line">
+                        <span id="playerDetailRating" class="badge-rating"><i class="fa-solid fa-star"></i> 8.4</span>
+                        <span id="playerDetailRuntime" class="meta-pill">2h 14m</span>
+                        <span id="playerDetailRelease" class="meta-pill">2026</span>
+                    </div>
+                    <div id="playerDetailGenres" class="genre-tags-list"></div>
+                    <p id="playerDetailOverview" class="player-overview-text">Synopsis du contenu...</p>
+                    <div id="playerDetailCast" class="cast-row"></div>
+                </div>
+            </div>
+
+            <!-- RECOMMANDATIONS SIMILAIRES -->
+            <div class="player-similar-section">
+                <h3 class="section-subtitle-heading"><i class="fa-solid fa-thumbs-up"></i> Vous pourriez aussi aimer</h3>
+                <div id="similarCarousel" class="media-carousel mini-carousel"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL D'INFORMATIONS & BANDE-ANNONCE ================= -->
+    <div id="infoModal" class="modal-overlay" style="display: none;" onclick="closeModalOnBackdrop(event)">
+        <div class="modal-dialog">
+            <button class="modal-close-btn" onclick="closeInfoModal()" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-banner" id="modalBanner">
+                <div class="modal-gradient"></div>
+                <div class="modal-banner-content">
+                    <h2 id="modalTitle" class="modal-title">Titre</h2>
+                    <div class="modal-meta-row">
+                        <span id="modalRating" class="badge-rating"><i class="fa-solid fa-star"></i> 8.2</span>
+                        <span id="modalYear" class="meta-pill">2026</span>
+                        <span id="modalType" class="meta-pill">Film</span>
+                        <span id="modalRuntime" class="meta-pill">1h 55m</span>
+                    </div>
+                    <div class="modal-actions-bar">
+                        <button id="modalPlayBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-play"></i> Regarder
+                        </button>
+                        <button id="modalBookmarkBtn" class="btn btn-secondary">
+                            <i class="fa-regular fa-bookmark"></i> Ma Liste
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-columns">
+                    <div class="modal-main-col">
+                        <h3>Synopsis</h3>
+                        <p id="modalOverview" class="modal-overview">Description complète...</p>
+                        
+                        <div id="modalTrailerContainer" class="modal-trailer-wrapper" style="display:none;">
+                            <h3><i class="fa-brands fa-youtube" style="color:#e50914;"></i> Bande-annonce officielle</h3>
+                            <div class="trailer-iframe-box">
+                                <iframe id="modalTrailerIframe" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>
+
+                        <h3>Distribution principale</h3>
+                        <div id="modalCastList" class="modal-cast-grid"></div>
+                    </div>
+
+                    <div class="modal-side-col">
+                        <div class="side-meta-block">
+                            <span class="meta-label">Genres</span>
+                            <div id="modalGenresList" class="genre-tags-list"></div>
+                        </div>
+                        <div class="side-meta-block">
+                            <span class="meta-label">Date de sortie</span>
+                            <span id="modalReleaseDate" class="meta-val">-</span>
+                        </div>
+                        <div class="side-meta-block">
+                            <span class="meta-label">Note des spectateurs</span>
+                            <span id="modalVotes" class="meta-val">-</span>
+                        </div>
+                        <div class="side-meta-block">
+                            <span class="meta-label">Statut</span>
+                            <span id="modalStatus" class="meta-val">Sorti</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toastNotification" class="toast-notification">
+        <i id="toastIcon" class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">Action effectuée</span>
+    </div>
+
+    <!-- FOOTER MODERNE -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="brand-logo">
+                    <span class="logo-icon"><i class="fa-solid fa-play"></i></span>
+                    <span class="logo-text">NAFY<span class="logo-accent">STREAM</span></span>
+                </div>
+                <p class="footer-tagline">Votre plateforme de streaming cinéma et séries, pensée pour les passionnés de 7ème art.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navigation</h4>
+                <a href="#" onclick="navigateTo('home'); return false;">Accueil</a>
+                <a href="#" onclick="navigateTo('movies'); return false;">Films</a>
+                <a href="#" onclick="navigateTo('series'); return false;">Séries</a>
+                <a href="#" onclick="navigateTo('trending'); return false;">Tendances</a>
+                <a href="#" onclick="navigateTo('watchlist'); return false;">Ma Liste</a>
+            </div>
+            <div class="footer-legal">
+                <h4>À propos</h4>
+                <p class="footer-disclaimer">
+                    Nafy Stream est une interface de découverte et de lecture qui n'héberge aucun fichier multimédia sur ses serveurs. Les métadonnées et affiches sont fournies par 
+                    <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">The Movie Database (TMDb)</a>.
+                </p>
+                <p class="copyright">&copy; 2026 Nafy Stream. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
