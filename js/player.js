@@ -161,31 +161,20 @@ Nafy.Player = {
                 if (countLabel) countLabel.textContent = `Saison ${seasonNumber} (${data.episodes.length} épisodes) :`;
 
                 data.episodes.forEach(ep => {
-                    const card = document.createElement('div');
-                    card.className = `episode-card-rich ${ep.episode_number === this.currentEpisode ? 'active' : ''}`;
-                    const thumbUrl = ep.still_path ? `${Nafy.Config.TMDB_STILL_BASE}${ep.still_path}` : '';
+                    const chip = document.createElement('button');
+                    chip.className = `episode-chip ${ep.episode_number === this.currentEpisode ? 'active' : ''}`;
+                    chip.textContent = `Ép. ${ep.episode_number}${ep.name ? ' : ' + ep.name : ''}`;
 
-                    card.innerHTML = `
-                        <div class="episode-thumb-box">
-                            ${thumbUrl ? `<img src="${thumbUrl}" alt="Ep ${ep.episode_number}">` : ''}
-                            <span class="episode-number-badge">Ép. ${ep.episode_number}</span>
-                        </div>
-                        <div class="episode-content">
-                            <div class="episode-name">${ep.name || `Épisode ${ep.episode_number}`}</div>
-                            <div class="episode-overview-mini">${ep.overview || 'Aucune description.'}</div>
-                        </div>
-                    `;
-
-                    card.onclick = () => {
-                        document.querySelectorAll('.episode-card-rich').forEach(c => c.classList.remove('active'));
-                        card.classList.add('active');
+                    chip.onclick = () => {
+                        document.querySelectorAll('.episode-chip').forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
                         this.currentEpisode = ep.episode_number;
                         this.syncUrlHash();
                         this.setServer(this.currentServer);
                         this.updateQuickNavButtons();
                     };
 
-                    container.appendChild(card);
+                    container.appendChild(chip);
                 });
             } else {
                 this.renderFallbackEpisodes(container, countLabel, seasonNumber);
@@ -203,22 +192,18 @@ Nafy.Player = {
         this.totalEpisodesInSeason = 24;
 
         for (let i = 1; i <= 24; i++) {
-            const card = document.createElement('div');
-            card.className = `episode-card-rich ${i === this.currentEpisode ? 'active' : ''}`;
-            card.innerHTML = `
-                <div class="episode-content">
-                    <div class="episode-name">Épisode ${i}</div>
-                </div>
-            `;
-            card.onclick = () => {
-                document.querySelectorAll('.episode-card-rich').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
+            const chip = document.createElement('button');
+            chip.className = `episode-chip ${i === this.currentEpisode ? 'active' : ''}`;
+            chip.textContent = `Épisode ${i}`;
+            chip.onclick = () => {
+                document.querySelectorAll('.episode-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
                 this.currentEpisode = i;
                 this.syncUrlHash();
                 this.setServer(this.currentServer);
                 this.updateQuickNavButtons();
             };
-            container.appendChild(card);
+            container.appendChild(chip);
         }
     },
 
@@ -243,7 +228,7 @@ Nafy.Player = {
     },
 
     highlightActiveEpisode() {
-        document.querySelectorAll('.episode-card-rich').forEach((c, idx) => {
+        document.querySelectorAll('.episode-chip').forEach((c, idx) => {
             if (idx + 1 === this.currentEpisode) c.classList.add('active');
             else c.classList.remove('active');
         });
