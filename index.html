@@ -282,7 +282,29 @@
                     <p class="section-subtitle">Découvrez et regardez les plus grands univers cinématographiques dans l'ordre chronologique</p>
                 </div>
             </div>
+
+            <!-- Barre de filtres par catégories et recherche de franchise -->
+            <div class="sagas-toolbar">
+                <div class="sagas-categories-scroll">
+                    <button class="saga-pill-btn active" data-cat="all" onclick="Nafy.App.setSagaCategory('all')">Toutes</button>
+                    <button class="saga-pill-btn" data-cat="action" onclick="Nafy.App.setSagaCategory('action')"><i class="fa-solid fa-car-side"></i> Action & Espionnage</button>
+                    <button class="saga-pill-btn" data-cat="scifi" onclick="Nafy.App.setSagaCategory('scifi')"><i class="fa-solid fa-rocket"></i> Sci-Fi & Espace</button>
+                    <button class="saga-pill-btn" data-cat="superhero" onclick="Nafy.App.setSagaCategory('superhero')"><i class="fa-solid fa-mask"></i> Super-Héros</button>
+                    <button class="saga-pill-btn" data-cat="adventure" onclick="Nafy.App.setSagaCategory('adventure')"><i class="fa-solid fa-compass"></i> Aventure & Fantasy</button>
+                    <button class="saga-pill-btn" data-cat="horror" onclick="Nafy.App.setSagaCategory('horror')"><i class="fa-solid fa-ghost"></i> Horreur & Frissons</button>
+                    <button class="saga-pill-btn" data-cat="animation" onclick="Nafy.App.setSagaCategory('animation')"><i class="fa-solid fa-wand-magic-sparkles"></i> Animation & Culte</button>
+                </div>
+                <div class="sagas-search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass sagas-search-icon"></i>
+                    <input type="text" id="sagasSearchInput" class="sagas-search-input" placeholder="Rechercher une saga..." oninput="Nafy.App.filterSagas()">
+                </div>
+            </div>
+
             <div id="sagasGrid" class="sagas-grid"></div>
+            <div id="sagasEmptyMsg" class="empty-state" style="display:none; padding:40px 20px;">
+                <i class="fa-solid fa-film" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:12px;"></i>
+                <p>Aucune franchise ne correspond à votre filtre.</p>
+            </div>
         </section>
 
         <!-- ================= SECTION DÉTAILS D'UNE COLLECTION ================= -->

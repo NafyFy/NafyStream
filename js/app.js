@@ -366,6 +366,41 @@ Nafy.App = {
             const card = Nafy.UI.createSagaCard(saga);
             grid.appendChild(card);
         });
+
+        const allBtn = document.querySelector('.saga-pill-btn[data-cat="all"]');
+        if (allBtn) allBtn.textContent = `Toutes (${Nafy.Config.SAGAS.length})`;
+
+        this.filterSagas();
+    },
+
+    setSagaCategory(category) {
+        document.querySelectorAll('.saga-pill-btn').forEach(btn => {
+            if (btn.dataset.cat === category) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        this.filterSagas();
+    },
+
+    filterSagas() {
+        const input = document.getElementById('sagasSearchInput');
+        const query = (input ? input.value : '').toLowerCase().trim();
+        const activeBtn = document.querySelector('.saga-pill-btn.active');
+        const activeCat = activeBtn ? activeBtn.dataset.cat : 'all';
+
+        const cards = document.querySelectorAll('#sagasGrid .saga-card');
+        let visibleCount = 0;
+        cards.forEach(card => {
+            const matchesCat = (activeCat === 'all' || card.dataset.category === activeCat);
+            const matchesQuery = (!query || card.dataset.name.includes(query));
+            const show = matchesCat && matchesQuery;
+            card.style.display = show ? 'block' : 'none';
+            if (show) visibleCount++;
+        });
+
+        const emptyMsg = document.getElementById('sagasEmptyMsg');
+        if (emptyMsg) {
+            emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
     },
 
     async loadCollection(collectionId) {

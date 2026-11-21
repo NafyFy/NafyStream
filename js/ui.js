@@ -125,6 +125,9 @@ Nafy.UI = {
     createSagaCard(saga) {
         const card = document.createElement('div');
         card.className = 'saga-card';
+        card.dataset.category = saga.category || 'all';
+        card.dataset.name = (saga.name || '').toLowerCase();
+        
         card.innerHTML = `
             <div class="saga-backdrop" style="background-image: url('${saga.backdrop}');">
                 <div class="saga-overlay"></div>
