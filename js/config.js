@@ -15,55 +15,73 @@ Nafy.Config = {
     TMDB_BACKDROP_BASE: 'https://image.tmdb.org/t/p/original',
     TMDB_STILL_BASE: 'https://image.tmdb.org/t/p/w300',
 
-    // SERVEURS DE STREAMING INTÉGRÉS
+    // SERVEURS DE STREAMING INTÉGRÉS & SPÉCIALISATIONS (VF / VOSTFR / FILMS / SÉRIES / ANIME)
     SERVERS: {
         moviez: {
             id: 'moviez',
             name: 'Serveur 1 (Moviez)',
-            badge: 'Rapide VF/VOST',
+            badge: 'VF Rapide',
             icon: 'fa-circle-play',
-            getMovieUrl: (id) => `https://api.moviez.ac/${id}`,
-            getTvUrl: (id, s, e) => `https://api.moviez.ac/serie/${id}/${s}/${e}`
+            specialty: 'Anime & Films VF',
+            tag: 'Top Anime & VF',
+            bestFor: ['anime_vf', 'movie_vf'],
+            getMovieUrl: (id, imdbId, lang) => `https://api.moviez.ac/${id}`,
+            getTvUrl: (id, imdbId, s, e, lang) => `https://api.moviez.ac/serie/${id}/${s}/${e}`
         },
         frembed: {
             id: 'frembed',
             name: 'Serveur 2 (Frembed)',
-            badge: 'HD Stable',
+            badge: 'HD Stable VF/VOST',
             icon: 'fa-play',
-            getMovieUrl: (id, imdbId) => `https://frembed.bar/embed/movie/${imdbId || id}`,
-            getTvUrl: (id, imdbId, s, e) => `https://frembed.bar/embed/tv/${imdbId || id}/${s}/${e}`
+            specialty: 'Films, Séries & Anime',
+            tag: 'Top Film VF & VOSTFR',
+            bestFor: ['movie_vf', 'movie_vostfr', 'tv_vf', 'anime_vostfr'],
+            getMovieUrl: (id, imdbId, lang) => `https://frembed.bar/embed/movie/${imdbId || id}${lang === 'vostfr' ? '?audio=vostfr' : '?audio=vf'}`,
+            getTvUrl: (id, imdbId, s, e, lang) => `https://frembed.bar/embed/tv/${imdbId || id}/${s}/${e}${lang === 'vostfr' ? '?audio=vostfr' : '?audio=vf'}`
         },
         vidlink: {
             id: 'vidlink',
-            name: 'Serveur 3 (VidLink)',
-            badge: 'Lecteur 1080p',
+            name: 'Serveur 3 (VidLink HD)',
+            badge: '1080p Multi-Subs',
             icon: 'fa-bolt',
-            getMovieUrl: (id) => `https://vidlink.pro/movie/${id}`,
-            getTvUrl: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}`
+            specialty: 'Séries & Master 1080p',
+            tag: 'Top Séries 1080p',
+            bestFor: ['tv_vostfr', 'tv_vf', 'movie_vostfr'],
+            getMovieUrl: (id, imdbId, lang) => `https://vidlink.pro/movie/${id}?sub=fr`,
+            getTvUrl: (id, imdbId, s, e, lang) => `https://vidlink.pro/tv/${id}/${s}/${e}?sub=fr`
         },
         multiembed: {
             id: 'multiembed',
             name: 'Serveur 4 (MultiEmbed)',
-            badge: 'Multi-langues',
+            badge: 'Multi-Langues',
             icon: 'fa-globe',
-            getMovieUrl: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1`,
-            getTvUrl: (id, s, e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`
-        },
-        vidsrc: {
-            id: 'vidsrc',
-            name: 'Serveur 5 (Vidsrc VIP)',
-            badge: 'Lecteur VIP',
-            icon: 'fa-crown',
-            getMovieUrl: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`,
-            getTvUrl: (id, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
+            specialty: 'Anime VOSTFR & Voix Jap',
+            tag: 'Top Anime VOSTFR',
+            bestFor: ['anime_vostfr', 'movie_vostfr'],
+            getMovieUrl: (id, imdbId, lang) => `https://multiembed.mov/?video_id=${id}&tmdb=1&sub=fr`,
+            getTvUrl: (id, imdbId, s, e, lang) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}&sub=fr`
         },
         embedsu: {
             id: 'embedsu',
-            name: 'Serveur 6 (Embed.su)',
+            name: 'Serveur 5 (Embed.su)',
             badge: 'Ultra Rapide',
             icon: 'fa-film',
+            specialty: 'Secours Rapide',
+            tag: 'Secours HD',
+            bestFor: ['backup'],
             getMovieUrl: (id) => `https://embed.su/embed/movie/${id}`,
-            getTvUrl: (id, s, e) => `https://embed.su/embed/tv/${id}/${s}/${e}`
+            getTvUrl: (id, imdbId, s, e) => `https://embed.su/embed/tv/${id}/${s}/${e}`
+        },
+        vidsrc: {
+            id: 'vidsrc',
+            name: 'Serveur 6 (Vidsrc VIP)',
+            badge: 'Lecteur VIP',
+            icon: 'fa-crown',
+            specialty: 'Flux International',
+            tag: 'Secours VIP',
+            bestFor: ['backup'],
+            getMovieUrl: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`,
+            getTvUrl: (id, imdbId, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
         }
     },
 

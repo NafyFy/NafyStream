@@ -223,11 +223,12 @@ Nafy.Storage = {
             const data = localStorage.getItem(this.KEYS.SETTINGS);
             return data ? JSON.parse(data) : {
                 theme: 'red',
-                server: 'moviez',
+                server: 'frembed',
+                preferredAudio: 'vf',
                 autoplayNext: true
             };
         } catch (e) {
-            return { theme: 'red', server: 'moviez', autoplayNext: true };
+            return { theme: 'red', server: 'frembed', preferredAudio: 'vf', autoplayNext: true };
         }
     },
 
@@ -235,6 +236,17 @@ Nafy.Storage = {
         try {
             localStorage.setItem(this.KEYS.SETTINGS, JSON.stringify(settings));
         } catch (e) {}
+    },
+
+    getPreferredAudio() {
+        const s = this.getSettings();
+        return s.preferredAudio || 'vf';
+    },
+
+    setPreferredAudio(audio) {
+        const s = this.getSettings();
+        s.preferredAudio = audio;
+        this.saveSettings(s);
     },
 
     // ================= EXPORT & IMPORT DES DONNÉES =================

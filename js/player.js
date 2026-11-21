@@ -10,7 +10,8 @@ Nafy.Player = {
     currentSeason: 1,
     currentEpisode: 1,
     totalEpisodesInSeason: 1,
-    currentServer: 'moviez',
+    currentServer: 'frembed',
+    preferredAudio: 'vf',
     currentDetails: null,
     isCinemaMode: false,
     shortcutsBound: false,
@@ -20,7 +21,149 @@ Nafy.Player = {
         if (settings && settings.server) {
             this.currentServer = settings.server;
         }
+        this.preferredAudio = Nafy.Storage.getPreferredAudio();
         this.setupKeyboardShortcuts();
+    },
+
+    isAnime(data) {
+        if (!data) return false;
+        const isJap = data.original_language === 'ja' || (data.origin_country && data.origin_country.includes('JP'));
+        const isAnimGenre = data.genres && data.genres.some(g => g.id === 16 || (g.name && g.name.toLowerCase().includes('anim')));
+        const hasAnimeKeyword = data.keywords && (
+            (data.keywords.results && data.keywords.results.some(k => (k.name || '').toLowerCase().includes('anime'))) ||
+            (data.keywords.keywords && data.keywords.keywords.some(k => (k.name || '').toLowerCase().includes('anime')))
+        );
+        return (isJap && isAnimGenre) || !!hasAnimeKeyword;
+    },
+
+    getRecommendedServer(data, mediaType, preferredAudio = 'vf') {
+        const isAnime = this.isAnime(data);
+
+        if (isAnime) {
+            if (preferredAudio === 'vf') {
+                return {
+                    serverId: 'moviez',
+                    title: 'Serveur 1 (Moviez)',
+                    reason: 'Le plus fluide et réactif pour les Animés en VF avec doublage français intégral.',
+                    badge: '⭐ Recommandé Anime VF'
+                };
+            } else {
+                return {
+                    serverId: 'frembed',
+                    title: 'Serveur 2 (Frembed)',
+                    reason: 'Le plus stable pour les Animés en VOSTFR avec voix japonaises et sous-titres FR synchronisés.',
+                    badge: '⭐ Recommandé Anime VOSTFR'
+                };
+            }
+        }
+
+        if (mediaType === 'tv') {
+            if (preferredAudio === 'vf') {
+                return {
+                    serverId: 'frembed',
+                    title: 'Serveur 2 (Frembed)',
+                    reason: 'Le meilleur pour les Séries en VF : pistes françaises natives et chargement sans latence.',
+                    badge: '⭐ Recommandé Séries VF'
+                };
+            } else {
+                return {
+                    serverId: 'vidlink',
+                    title: 'Serveur 3 (VidLink HD)',
+                    reason: 'Le meilleur pour les Séries en VOSTFR : qualité 1080p, enchaînement direct d\'épisodes et sous-titres FR.',
+                    badge: '⭐ Recommandé Séries 1080p'
+                };
+            }
+        }
+
+        // Pour les films
+        if (preferredAudio === 'vf') {
+            return {
+                serverId: 'frembed',
+                title: 'Serveur 2 (Frembed)',
+                reason: 'Recommandé pour les Films en VF : grande stabilité, audio doublé en français et flux HD.',
+                badge: '⭐ Recommandé Film VF'
+            };
+        } else {
+            return {
+                serverId: 'vidlink',
+                title: 'Serveur 3 (VidLink HD)',
+                reason: 'Recommandé pour les Films en VOSTFR : débit 1080p élevé et sous-titres français intégrés.',
+                badge: '⭐ Recommandé Film VOSTFR'
+            };
+        }
+    },
+
+    setPreferredAudio(lang) {
+        this.preferredAudio = lang;
+        Nafy.Storage.setPreferredAudio(lang);
+
+        document.querySelectorAll('.audio-tab-btn').forEach(btn => {
+            if (btn.dataset.audio === lang) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        // Met à jour la recommandation selon la nouvelle langue
+        const rec = this.getRecommendedServer(this.currentDetails, this.currentMediaType, this.preferredAudio);
+        this.renderRecommendationBanner(rec);
+        this.renderServerButtons(rec.serverId);
+
+        // Bascule automatiquement sur le meilleur serveur recommandé pour cette langue
+        this.setServer(rec.serverId);
+        Nafy.UI.showToast(`Langue basculée sur : ${lang.toUpperCase()}`, 'fa-headphones');
+    },
+
+    renderRecommendationBanner(rec) {
+        const box = document.getElementById('playerRecommendationBox');
+        if (!box) return;
+
+        const isAnime = this.isAnime(this.currentDetails);
+        const typeLabel = isAnime ? 'Animé' : (this.currentMediaType === 'tv' ? 'Série' : 'Film');
+        const audioLabel = this.preferredAudio === 'vf' ? 'VF (Français)' : 'VOSTFR (Sous-titres FR)';
+
+        box.innerHTML = `
+            <div class="player-rec-inner">
+                <div class="rec-icon-badge">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div class="rec-content">
+                    <div class="rec-title">
+                        <span class="rec-highlight">${rec.badge}</span>
+                        <span>pour ce ${typeLabel} en ${audioLabel} : <strong>${rec.title}</strong></span>
+                    </div>
+                    <div class="rec-desc">${rec.reason}</div>
+                </div>
+            </div>
+        `;
+        box.style.display = 'block';
+    },
+
+    renderServerButtons(recommendedServerId) {
+        const container = document.getElementById('serverButtonsContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        Object.keys(Nafy.Config.SERVERS).forEach(key => {
+            const srv = Nafy.Config.SERVERS[key];
+            const isRec = key === recommendedServerId;
+            const btn = document.createElement('button');
+            btn.id = `btn-${srv.id}`;
+            btn.className = `server-btn ${this.currentServer === srv.id ? 'active' : ''} ${isRec ? 'is-recommended' : ''}`;
+            
+            btn.innerHTML = `
+                <i class="fa-solid ${srv.icon}"></i>
+                <div class="server-btn-info">
+                    <span class="server-btn-name">${srv.name}</span>
+                    <span class="server-btn-badge">${srv.tag || srv.badge}</span>
+                </div>
+                ${isRec ? '<span class="server-star-tag"><i class="fa-solid fa-star"></i> Recommandé</span>' : ''}
+            `;
+
+            btn.onclick = () => {
+                this.setServer(srv.id);
+            };
+
+            container.appendChild(btn);
+        });
     },
 
     setupKeyboardShortcuts() {
@@ -171,10 +314,31 @@ Nafy.Player = {
                 this.setupSeasonDropdown(data.seasons || []);
             }
 
+            // Détection du type spécifique (Animé, Série, Film)
+            const isAnime = this.isAnime(data);
+            const badgeEl = document.getElementById('playerMediaBadge');
+            if (badgeEl) {
+                badgeEl.textContent = isAnime ? 'ANIMÉ' : (mediaType === 'tv' ? 'SÉRIE' : 'FILM');
+                if (isAnime) badgeEl.classList.add('badge-anime');
+                else badgeEl.classList.remove('badge-anime');
+            }
+
+            // Calcul du meilleur serveur recommandé pour cette œuvre
+            const rec = this.getRecommendedServer(data, mediaType, this.preferredAudio);
+            this.renderRecommendationBanner(rec);
+
+            // Mise à jour de l'état des onglets audio (VF / VOSTFR)
+            document.querySelectorAll('.audio-tab-btn').forEach(btn => {
+                if (btn.dataset.audio === this.preferredAudio) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
             // Recommandations similaires
             this.renderSimilar(data.similar ? data.similar.results : []);
 
-            // Lancement du flux vidéo
+            // Sélection et rendu des serveurs (choix prioritaire automatique)
+            this.currentServer = rec.serverId;
+            this.renderServerButtons(rec.serverId);
             this.setServer(this.currentServer);
 
         } catch (err) {
@@ -338,7 +502,7 @@ Nafy.Player = {
         container.innerHTML = `
             <div class="player-loader">
                 <div class="spinner"></div>
-                <p>Connexion au ${srv.name}...</p>
+                <p>Connexion au ${srv.name} (${this.preferredAudio.toUpperCase()})...</p>
             </div>
         `;
 
@@ -346,9 +510,9 @@ Nafy.Player = {
         let url = '';
 
         if (this.currentMediaType === 'tv') {
-            url = srv.getTvUrl(this.currentId, imdbId, this.currentSeason, this.currentEpisode);
+            url = srv.getTvUrl(this.currentId, imdbId, this.currentSeason, this.currentEpisode, this.preferredAudio);
         } else {
-            url = srv.getMovieUrl(this.currentId, imdbId);
+            url = srv.getMovieUrl(this.currentId, imdbId, this.preferredAudio);
         }
 
         setTimeout(() => {

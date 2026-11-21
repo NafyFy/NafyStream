@@ -446,30 +446,32 @@
                 </div>
             </div>
 
-            <!-- Sélecteur de serveurs (6 sources) -->
+            <!-- Sélecteur de Version Audio (VF / VOSTFR) & Serveurs recommandés -->
             <div class="player-server-panel">
-                <div class="server-label">
-                    <i class="fa-solid fa-server"></i> Serveur :
+                <div class="player-audio-row">
+                    <div class="audio-label">
+                        <i class="fa-solid fa-headphones"></i> Version Audio prioritaire :
+                    </div>
+                    <div class="audio-toggle-group">
+                        <button class="audio-tab-btn active" data-audio="vf" onclick="Nafy.Player.setPreferredAudio('vf')">
+                            <span class="flag-icon">🇫🇷</span> Version Française (VF)
+                        </button>
+                        <button class="audio-tab-btn" data-audio="vostfr" onclick="Nafy.Player.setPreferredAudio('vostfr')">
+                            <span class="flag-icon">💬</span> Sous-titré Français (VOSTFR)
+                        </button>
+                    </div>
                 </div>
-                <div class="server-buttons">
-                    <button id="btn-moviez" class="server-btn active" onclick="Nafy.Player.setServer('moviez')">
-                        <i class="fa-solid fa-circle-play"></i> Serveur 1 (Moviez)
-                    </button>
-                    <button id="btn-frembed" class="server-btn" onclick="Nafy.Player.setServer('frembed')">
-                        <i class="fa-solid fa-play"></i> Serveur 2 (Frembed)
-                    </button>
-                    <button id="btn-vidlink" class="server-btn" onclick="Nafy.Player.setServer('vidlink')">
-                        <i class="fa-solid fa-bolt"></i> Serveur 3 (VidLink HD)
-                    </button>
-                    <button id="btn-multiembed" class="server-btn" onclick="Nafy.Player.setServer('multiembed')">
-                        <i class="fa-solid fa-globe"></i> Serveur 4 (MultiEmbed)
-                    </button>
-                    <button id="btn-vidsrc" class="server-btn" onclick="Nafy.Player.setServer('vidsrc')">
-                        <i class="fa-solid fa-crown"></i> Serveur 5 (Vidsrc VIP)
-                    </button>
-                    <button id="btn-embedsu" class="server-btn" onclick="Nafy.Player.setServer('embedsu')">
-                        <i class="fa-solid fa-film"></i> Serveur 6 (Embed.su)
-                    </button>
+
+                <!-- Bannière de recommandation intelligente du meilleur serveur -->
+                <div id="playerRecommendationBox" class="player-rec-box" style="display: none;"></div>
+
+                <div class="server-selection-row">
+                    <div class="server-label">
+                        <i class="fa-solid fa-server"></i> Choisir une source vidéo :
+                    </div>
+                    <div id="serverButtonsContainer" class="server-buttons">
+                        <!-- Rendu dynamique par Nafy.Player.renderServerButtons() -->
+                    </div>
                 </div>
             </div>
 
