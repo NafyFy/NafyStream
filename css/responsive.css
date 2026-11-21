@@ -32,7 +32,17 @@
     }
 
     #main-content {
-        padding: 0 16px 40px;
+        padding: 0 16px 85px; /* Espace pour la barre basse sur mobile */
+    }
+
+    .bottom-nav-bar {
+        display: flex;
+    }
+
+    .person-profile-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
     }
 
     .hero-banner {

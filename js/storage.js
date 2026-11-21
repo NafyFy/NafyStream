@@ -9,7 +9,8 @@ Nafy.Storage = {
         WATCHLIST: 'nafy_watchlist',
         HISTORY: 'nafy_history',
         RATINGS: 'nafy_ratings',
-        SETTINGS: 'nafy_settings'
+        SETTINGS: 'nafy_settings',
+        RECENT_SEARCHES: 'nafy_recent_searches'
     },
 
     // ================= WATCHLIST =================
@@ -63,10 +64,16 @@ Nafy.Storage = {
 
     notifyWatchlistChange() {
         const badge = document.getElementById('watchlist-badge');
+        const mobileBadge = document.getElementById('mobileWatchlistBadge');
+        const count = this.getWatchlist().length;
+
         if (badge) {
-            const count = this.getWatchlist().length;
             badge.textContent = count;
             badge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+        if (mobileBadge) {
+            mobileBadge.textContent = count;
+            mobileBadge.style.display = count > 0 ? 'inline-block' : 'none';
         }
     },
 
@@ -101,8 +108,7 @@ Nafy.Storage = {
         }
 
         history.unshift(entry);
-        // Conserve les 20 derniers titres
-        if (history.length > 20) history.pop();
+        if (history.length > 25) history.pop();
 
         try {
             localStorage.setItem(this.KEYS.HISTORY, JSON.stringify(history));
@@ -119,6 +125,96 @@ Nafy.Storage = {
 
     clearHistory() {
         localStorage.removeItem(this.KEYS.HISTORY);
+    },
+
+    // ================= RECHERCHES RÉCENTES =================
+    getRecentSearches() {
+        try {
+            const data = localStorage.getItem(this.KEYS.RECENT_SEARCHES);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            return [];
+        }
+    },
+
+    addRecentSearch(query) {
+        if (!query || query.trim().length === 0) return;
+        const q = query.trim();
+        let list = this.getRecentSearches().filter(item => item.toLowerCase() !== q.toLowerCase());
+        list.unshift(q);
+        if (list.length > 8) list.pop();
+        try {
+            localStorage.setItem(this.KEYS.RECENT_SEARCHES, JSON.stringify(list));
+        } catch (e) {}
+    },
+
+    clearRecentSearches() {
+        localStorage.removeItem(this.KEYS.RECENT_SEARCHES);
+    },
+
+    // ================= NOTATIONS PERSONNELLES (1-5 ÉTOILES) =================
+    getRatings() {
+        try {
+            const data = localStorage.getItem(this.KEYS.RATINGS);
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            return {};
+        }
+    },
+
+    getRating(id) {
+        const ratings = this.getRatings();
+        return ratings[id] ? ratings[id].rating : 0;
+    },
+
+    setRating(id, ratingNumber, mediaData = {}) {
+        const ratings = this.getRatings();
+        if (ratingNumber <= 0) {
+            delete ratings[id];
+        } else {
+            ratings[id] = {
+                id,
+                rating: ratingNumber,
+                title: mediaData.title || mediaData.name || 'Titre',
+                poster_path: mediaData.poster_path || '',
+                media_type: mediaData.media_type || 'movie',
+                ratedAt: Date.now()
+            };
+        }
+        try {
+            localStorage.setItem(this.KEYS.RATINGS, JSON.stringify(ratings));
+        } catch (e) {}
+    },
+
+    // ================= STATISTIQUES DE VISIONNAGE =================
+    getStats() {
+        const history = this.getHistory();
+        const watchlist = this.getWatchlist();
+        const ratings = this.getRatings();
+
+        let moviesCount = 0;
+        let episodesCount = 0;
+
+        history.forEach(item => {
+            if (item.media_type === 'tv') {
+                episodesCount += (item.episode || 1);
+            } else {
+                moviesCount += 1;
+            }
+        });
+
+        // Estimation du temps : 110 min par film, 45 min par épisode
+        const totalMinutes = (moviesCount * 110) + (episodesCount * 45);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        return {
+            moviesCount,
+            episodesCount,
+            totalHoursFormatted: hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`,
+            watchlistCount: watchlist.length,
+            ratingsCount: Object.keys(ratings).length
+        };
     },
 
     // ================= PARAMÈTRES & THÈMES =================
@@ -148,6 +244,8 @@ Nafy.Storage = {
             exportedAt: new Date().toISOString(),
             watchlist: this.getWatchlist(),
             history: this.getHistory(),
+            ratings: this.getRatings(),
+            recentSearches: this.getRecentSearches(),
             settings: this.getSettings()
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -167,6 +265,12 @@ Nafy.Storage = {
             }
             if (Array.isArray(parsed.history)) {
                 localStorage.setItem(this.KEYS.HISTORY, JSON.stringify(parsed.history));
+            }
+            if (parsed.ratings && typeof parsed.ratings === 'object') {
+                localStorage.setItem(this.KEYS.RATINGS, JSON.stringify(parsed.ratings));
+            }
+            if (Array.isArray(parsed.recentSearches)) {
+                localStorage.setItem(this.KEYS.RECENT_SEARCHES, JSON.stringify(parsed.recentSearches));
             }
             if (parsed.settings) {
                 localStorage.setItem(this.KEYS.SETTINGS, JSON.stringify(parsed.settings));

@@ -312,7 +312,28 @@
 }
 
 
-/* CARTE DE DÉTAILS SOUS LE LECTEUR */
+/* ================= MODE CINÉMA (LUMIÈRES ÉTEINTES) ================= */
+body.cinema-lights-off {
+    background-color: #000000 !important;
+}
+
+body.cinema-lights-off #main-header,
+body.cinema-lights-off .main-footer,
+body.cinema-lights-off .player-details-card,
+body.cinema-lights-off .player-similar-section,
+body.cinema-lights-off .bottom-nav-bar,
+body.cinema-lights-off .player-hint-bar {
+    opacity: 0.04;
+    filter: blur(2px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+body.cinema-lights-off .screen-container {
+    box-shadow: 0 0 100px rgba(0, 0, 0, 1), 0 0 60px var(--primary-glow);
+    transform: scale(1.02);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
 .player-details-card {
     display: flex;
     gap: 30px;

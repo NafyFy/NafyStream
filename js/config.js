@@ -6,7 +6,7 @@ window.Nafy = window.Nafy || {};
 
 Nafy.Config = {
     APP_NAME: 'Nafy Stream',
-    VERSION: '2.5.0',
+    VERSION: '2.6.0',
     
     // API TMDB
     TMDB_API_KEY: 'aca5581c3c1261367bad7827b83ffee4',
@@ -86,5 +86,20 @@ Nafy.Config = {
         { id: 337, name: 'Disney+', icon: 'fa-solid fa-wand-magic-sparkles' },
         { id: 381, name: 'Canal+', icon: 'fa-solid fa-tv' },
         { id: 2, name: 'Apple TV+', icon: 'fa-brands fa-apple' }
+    ]
+,
+
+    // SAGAS & FRANCHISES CULTES (Collections TMDb)
+    SAGAS: [
+        { id: 1241, name: 'Harry Potter', icon: 'fa-wand-magic-sparkles', backdrop: 'https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=1200&auto=format&fit=crop&q=80', count: 8 },
+        { id: 119, name: 'Le Seigneur des Anneaux', icon: 'fa-ring', backdrop: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&auto=format&fit=crop&q=80', count: 3 },
+        { id: 10, name: 'Star Wars', icon: 'fa-jedi', backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80', count: 9 },
+        { id: 263, name: 'The Dark Knight (Batman)', icon: 'fa-mask', backdrop: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1200&auto=format&fit=crop&q=80', count: 3 },
+        { id: 9485, name: 'Fast & Furious', icon: 'fa-car-side', backdrop: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&auto=format&fit=crop&q=80', count: 10 },
+        { id: 295, name: 'Pirates des Caraïbes', icon: 'fa-skull-crossbones', backdrop: 'https://images.unsplash.com/photo-1509718443690-d8e2fb3474b7?w=1200&auto=format&fit=crop&q=80', count: 5 },
+        { id: 404609, name: 'John Wick', icon: 'fa-gun', backdrop: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1200&auto=format&fit=crop&q=80', count: 4 },
+        { id: 131635, name: 'Hunger Games', icon: 'fa-fire', backdrop: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&auto=format&fit=crop&q=80', count: 5 },
+        { id: 531241, name: 'Spider-Man (MCU & Sony)', icon: 'fa-spider', backdrop: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=1200&auto=format&fit=crop&q=80', count: 8 },
+        { id: 87359, name: 'Mission: Impossible', icon: 'fa-user-secret', backdrop: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&auto=format&fit=crop&q=80', count: 7 }
     ]
 };

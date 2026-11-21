@@ -1,5 +1,5 @@
 /**
- * NAFY STREAM — GESTIONNAIRE DE L'INTERFACE UTILISATEUR & MODALS
+ * NAFY STREAM — GESTIONNAIRE DE L'INTERFACE UTILISATEUR, MODALS & INTERACTIONS
  */
 
 window.Nafy = window.Nafy || {};
@@ -42,6 +42,7 @@ Nafy.UI = {
             : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=60';
 
         const isSaved = Nafy.Storage.isInWatchlist(item.id);
+        const userRating = Nafy.Storage.getRating(item.id);
 
         card.innerHTML = `
             <div class="card-poster-wrapper">
@@ -50,6 +51,7 @@ Nafy.UI = {
                     <span class="card-rating-badge"><i class="fa-solid fa-star"></i> ${rating}</span>
                     <span class="card-type-badge">${typeLabel}</span>
                 </div>
+                ${userRating > 0 ? `<div class="card-user-rating-badge"><i class="fa-solid fa-star"></i> ${userRating}/5</div>` : ''}
                 <button class="card-bookmark-btn ${isSaved ? 'saved' : ''}" title="${isSaved ? 'Retirer de Ma Liste' : 'Ajouter à Ma Liste'}" onclick="event.stopPropagation(); Nafy.UI.handleCardBookmark(this, ${item.id})">
                     <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
                 </button>
@@ -120,6 +122,25 @@ Nafy.UI = {
         return card;
     },
 
+    createSagaCard(saga) {
+        const card = document.createElement('div');
+        card.className = 'saga-card';
+        card.innerHTML = `
+            <div class="saga-backdrop" style="background-image: url('${saga.backdrop}');">
+                <div class="saga-overlay"></div>
+                <div class="saga-content">
+                    <span class="saga-badge"><i class="fa-solid ${saga.icon}"></i> Franchise</span>
+                    <h3 class="saga-name">${this.escapeHtml(saga.name)}</h3>
+                    <p class="saga-count">${saga.count} films officiels</p>
+                </div>
+            </div>
+        `;
+        card.onclick = () => {
+            Nafy.Router.navigate(`collection/${saga.id}`);
+        };
+        return card;
+    },
+
     handleCardBookmark(btn, id) {
         const card = btn.closest('.media-card');
         if (!card || !card._mediaData) return;
@@ -147,6 +168,79 @@ Nafy.UI = {
         this.showToast("Titre retiré de l'historique", 'fa-trash-can');
     },
 
+    // ================= SYSTÈME DE NOTATION PERSONNELLE =================
+    renderStarRating(containerId, mediaId, mediaData) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const currentRating = Nafy.Storage.getRating(mediaId);
+
+        container.innerHTML = `
+            <div class="star-rating-widget">
+                <span class="star-label">Votre note :</span>
+                <div class="stars-row" data-id="${mediaId}">
+                    ${[1, 2, 3, 4, 5].map(star => `
+                        <button class="star-btn ${star <= currentRating ? 'filled' : ''}" data-star="${star}" title="${star} étoile(s)">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                    `).join('')}
+                </div>
+                <span class="rating-display-text">${currentRating > 0 ? `${currentRating}/5 ★` : 'Non noté'}</span>
+            </div>
+        `;
+
+        const stars = container.querySelectorAll('.star-btn');
+        stars.forEach(btn => {
+            btn.onclick = () => {
+                const starVal = parseInt(btn.dataset.star, 10);
+                const newRating = starVal === currentRating ? 0 : starVal;
+                Nafy.Storage.setRating(mediaId, newRating, mediaData);
+                this.renderStarRating(containerId, mediaId, mediaData);
+                this.showToast(newRating > 0 ? `Noté ${newRating}/5 étoiles !` : 'Note retirée', 'fa-star');
+            };
+        });
+    },
+
+    // ================= RECHERCHES RÉCENTES =================
+    renderRecentSearches() {
+        const container = document.getElementById('recentSearchesBox');
+        if (!container) return;
+
+        const list = Nafy.Storage.getRecentSearches();
+        if (list.length === 0) {
+            container.innerHTML = '';
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'flex';
+        container.innerHTML = `
+            <span class="recent-title"><i class="fa-solid fa-clock-rotate-left"></i> Récents :</span>
+            <div class="recent-pills">
+                ${list.map(q => `
+                    <button class="recent-pill" onclick="Nafy.Router.navigate('search/${encodeURIComponent(q)}')">
+                        ${this.escapeHtml(q)}
+                    </button>
+                `).join('')}
+            </div>
+            <button class="clear-recent-btn" onclick="Nafy.Storage.clearRecentSearches(); Nafy.UI.renderRecentSearches();" title="Effacer l'historique de recherche">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        `;
+    },
+
+    // ================= SURPRENEZ-MOI (SHUFFLE ALÉATOIRE) =================
+    async triggerRandomSurprise() {
+        this.showToast("🎲 Tirage au sort en cours...", "fa-dice");
+        const title = await Nafy.Api.getRandomTitle(Math.random() > 0.4 ? 'movie' : 'tv');
+        if (title) {
+            this.showToast(`✨ Sélectionné : ${title.title || title.name}`, "fa-sparkles");
+            this.openInfoModal(title.id, title.media_type || 'movie');
+        } else {
+            this.showToast("Impossible de piocher un titre pour le moment", "fa-triangle-exclamation");
+        }
+    },
+
     // ================= MODAL D'INFORMATIONS ÉTENDU =================
     async openInfoModal(id, mediaType = 'movie') {
         const modal = document.getElementById('infoModal');
@@ -154,7 +248,6 @@ Nafy.UI = {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
-        // Réinitialise les onglets sur le premier
         this.switchModalTab('synopsis');
 
         document.getElementById('modalTitle').textContent = 'Chargement...';
@@ -190,6 +283,9 @@ Nafy.UI = {
             document.getElementById('modalVotes').textContent = `${rating} / 10 (${data.vote_count || 0} avis)`;
             document.getElementById('modalStatus').textContent = data.status || 'Disponible';
 
+            // Notation personnelle dans la modale
+            this.renderStarRating('modalStarRatingBox', id, data);
+
             // Genres
             const genresList = document.getElementById('modalGenresList');
             genresList.innerHTML = '';
@@ -213,14 +309,18 @@ Nafy.UI = {
                 }
             }
 
-            // Casting
+            // Distribution cliquable (Acteur / Réalisateur)
             const castList = document.getElementById('modalCastList');
             castList.innerHTML = '';
             if (data.credits && data.credits.cast) {
-                data.credits.cast.slice(0, 8).forEach(actor => {
-                    const chip = document.createElement('span');
-                    chip.className = 'cast-chip';
-                    chip.textContent = `${actor.name} (${actor.character || 'Rôle'})`;
+                data.credits.cast.slice(0, 10).forEach(actor => {
+                    const chip = document.createElement('button');
+                    chip.className = 'cast-chip clickable';
+                    chip.innerHTML = `<i class="fa-solid fa-user" style="font-size:0.75rem; margin-right:4px;"></i> ${actor.name} <span class="cast-role">(${actor.character || 'Rôle'})</span>`;
+                    chip.onclick = () => {
+                        this.closeInfoModal();
+                        Nafy.Router.navigate(`person/${actor.id}/${encodeURIComponent(actor.name)}`);
+                    };
                     castList.appendChild(chip);
                 });
             }
@@ -238,7 +338,7 @@ Nafy.UI = {
                     box.style.borderRadius = '8px';
                     box.innerHTML = `
                         <strong style="color:var(--text-main); font-size:0.9rem;">${this.escapeHtml(r.author)}</strong>
-                        <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.5; margin-top:6px;">${this.escapeHtml(r.content.substring(0, 300))}...</p>
+                        <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.5; margin-top:6px;">${this.escapeHtml(r.content.substring(0, 320))}...</p>
                     `;
                     reviewsContainer.appendChild(box);
                 });
@@ -260,6 +360,18 @@ Nafy.UI = {
                 });
             } else {
                 provContainer.innerHTML = '<p class="text-muted" style="font-size:0.9rem;">Non disponible sur les abonnements officiels en France.</p>';
+            }
+
+            // Saga / Franchise liée
+            if (data.belongs_to_collection) {
+                const sagaBanner = document.createElement('div');
+                sagaBanner.className = 'modal-saga-link';
+                sagaBanner.innerHTML = `
+                    <i class="fa-solid fa-layer-group" style="color:var(--primary);"></i>
+                    <span>Fait partie de la collection <strong>${this.escapeHtml(data.belongs_to_collection.name)}</strong></span>
+                    <button class="btn btn-sm btn-secondary" onclick="Nafy.UI.closeInfoModal(); Nafy.Router.navigate('collection/${data.belongs_to_collection.id}')">Voir la saga</button>
+                `;
+                document.querySelector('.modal-main-col').prepend(sagaBanner);
             }
 
             // Boutons d'action du modal
@@ -308,10 +420,15 @@ Nafy.UI = {
         else btn.classList.remove('btn-primary');
     },
 
-    // ================= MODAL DE PARAMÈTRES =================
+    // ================= MODAL DE PARAMÈTRES & STATISTIQUES =================
     openSettingsModal() {
         const modal = document.getElementById('settingsModal');
-        if (modal) modal.style.display = 'flex';
+        if (!modal) return;
+
+        // Met à jour les stats en direct
+        this.renderStatsDashboard();
+
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     },
 
@@ -319,6 +436,33 @@ Nafy.UI = {
         const modal = document.getElementById('settingsModal');
         if (modal) modal.style.display = 'none';
         document.body.style.overflow = '';
+    },
+
+    renderStatsDashboard() {
+        const stats = Nafy.Storage.getStats();
+        const container = document.getElementById('settingsStatsBox');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-num">${stats.moviesCount}</span>
+                    <span class="stat-title"><i class="fa-solid fa-film"></i> Films vus</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">${stats.episodesCount}</span>
+                    <span class="stat-title"><i class="fa-solid fa-tv"></i> Épisodes vus</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">${stats.totalHoursFormatted}</span>
+                    <span class="stat-title"><i class="fa-solid fa-stopwatch"></i> Temps estimé</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">${stats.ratingsCount}</span>
+                    <span class="stat-title"><i class="fa-solid fa-star gold"></i> Titres notés</span>
+                </div>
+            </div>
+        `;
     },
 
     setTheme(themeName) {

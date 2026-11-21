@@ -1,5 +1,5 @@
 /**
- * NAFY STREAM — LECTEUR VIDÉO AVANCÉ, CONTRÔLES SÉRIES & MULTI-SERVEURS
+ * NAFY STREAM — LECTEUR VIDÉO AVANCÉ, CONTRÔLES SÉRIES, RACCOURCIS & MULTI-SERVEURS
  */
 
 window.Nafy = window.Nafy || {};
@@ -12,12 +12,89 @@ Nafy.Player = {
     totalEpisodesInSeason: 1,
     currentServer: 'moviez',
     currentDetails: null,
+    isCinemaMode: false,
+    shortcutsBound: false,
 
     init() {
         const settings = Nafy.Storage.getSettings();
         if (settings && settings.server) {
             this.currentServer = settings.server;
         }
+        this.setupKeyboardShortcuts();
+    },
+
+    setupKeyboardShortcuts() {
+        if (this.shortcutsBound) return;
+        this.shortcutsBound = true;
+
+        document.addEventListener('keydown', (e) => {
+            // Ignore si l'utilisateur est en train de taper dans un champ de recherche ou un input
+            if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+            // Raccourcis uniquement actifs quand la vue lecteur est affichée
+            if (Nafy.Router.currentRoute === 'player') {
+                const key = e.key.toLowerCase();
+
+                if (key === 'l') {
+                    e.preventDefault();
+                    this.toggleCinemaMode();
+                } else if (key === 'f') {
+                    e.preventDefault();
+                    this.toggleFullscreen();
+                } else if (key === 'n') {
+                    e.preventDefault();
+                    this.nextEpisode();
+                } else if (key === 'p') {
+                    e.preventDefault();
+                    this.prevEpisode();
+                } else if (key === 's') {
+                    e.preventDefault();
+                    this.cycleServer();
+                }
+            }
+        });
+    },
+
+    toggleCinemaMode(forceState = null) {
+        this.isCinemaMode = forceState !== null ? forceState : !this.isCinemaMode;
+        const body = document.body;
+        const btn = document.getElementById('cinemaModeBtn');
+
+        if (this.isCinemaMode) {
+            body.classList.add('cinema-lights-off');
+            if (btn) {
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fa-solid fa-lightbulb"></i> Allumer les lumières';
+            }
+            Nafy.UI.showToast('Mode Cinéma activé (L pour quitter)', 'fa-moon');
+        } else {
+            body.classList.remove('cinema-lights-off');
+            if (btn) {
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fa-regular fa-lightbulb"></i> Mode Cinéma';
+            }
+        }
+    },
+
+    toggleFullscreen() {
+        const screenEl = document.querySelector('.screen-container');
+        if (!screenEl) return;
+
+        if (!document.fullscreenElement) {
+            if (screenEl.requestFullscreen) screenEl.requestFullscreen();
+            else if (screenEl.webkitRequestFullscreen) screenEl.webkitRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+    },
+
+    cycleServer() {
+        const servers = Object.keys(Nafy.Config.SERVERS);
+        const currentIndex = servers.indexOf(this.currentServer);
+        const nextIndex = (currentIndex + 1) % servers.length;
+        const nextServer = servers[nextIndex];
+        this.setServer(nextServer);
+        Nafy.UI.showToast(`Bascule vers ${Nafy.Config.SERVERS[nextServer].name}`, 'fa-server');
     },
 
     async play(id, mediaType = 'movie', season = 1, episode = 1, updateHash = true) {
@@ -75,6 +152,9 @@ Nafy.Player = {
                     });
                 }
             }
+
+            // Système d'étoiles personnelles sous le lecteur
+            Nafy.UI.renderStarRating('playerStarRatingBox', id, data);
 
             // Bouton bookmark
             const bookmarkBtn = document.getElementById('playerBookmarkBtn');
@@ -214,6 +294,7 @@ Nafy.Player = {
             this.highlightActiveEpisode();
             this.setServer(this.currentServer);
             this.updateQuickNavButtons();
+            Nafy.UI.showToast(`Lecture de l'épisode ${this.currentEpisode}`, 'fa-forward-step');
         }
     },
 
@@ -224,6 +305,7 @@ Nafy.Player = {
             this.highlightActiveEpisode();
             this.setServer(this.currentServer);
             this.updateQuickNavButtons();
+            Nafy.UI.showToast(`Lecture de l'épisode ${this.currentEpisode}`, 'fa-backward-step');
         }
     },
 

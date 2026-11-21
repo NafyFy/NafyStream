@@ -61,6 +61,29 @@ Nafy.Router = {
                 Nafy.App.loadProviderCatalog(providerId, providerName);
                 return;
             }
+        } else if (route === 'sagas') {
+            this.setSection('sagas');
+            Nafy.App.renderSagas();
+            return;
+        } else if (route === 'collection') {
+            const colId = parseInt(parts[1], 10);
+            if (!isNaN(colId)) {
+                this.setSection('collection');
+                Nafy.App.loadCollection(colId);
+                return;
+            }
+        } else if (route === 'person') {
+            const personId = parseInt(parts[1], 10);
+            const personName = decodeURIComponent(parts[2] || '');
+            if (!isNaN(personId)) {
+                this.setSection('person');
+                Nafy.App.loadPersonFilmography(personId, personName);
+                return;
+            }
+        } else if (route === 'ratings') {
+            this.setSection('ratings');
+            Nafy.App.renderRatings();
+            return;
         } else if (route === 'search') {
             const query = decodeURIComponent(parts.slice(1).join('/') || '');
             if (query) {
@@ -97,11 +120,16 @@ Nafy.Router = {
         }
         this.currentRoute = sectionId;
 
+        // Quitte le mode cinéma si actif
+        if (Nafy.Player && Nafy.Player.isCinemaMode) {
+            Nafy.Player.toggleCinemaMode(false);
+        }
+
         // Masque toutes les sections
         document.querySelectorAll('.view-section').forEach(sec => sec.style.display = 'none');
 
-        // Met à jour la classe active sur les liens nav
-        document.querySelectorAll('.nav-link').forEach(link => {
+        // Met à jour la classe active sur les liens nav desktop & mobile
+        document.querySelectorAll('.nav-link, .bottom-nav-item').forEach(link => {
             if (link.dataset.target === sectionId) {
                 link.classList.add('active');
             } else {

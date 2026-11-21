@@ -11,6 +11,8 @@ Nafy.App = {
         providerId: null,
         title: '',
         sortBy: 'popularity.desc',
+        year: null,
+        minRating: null,
         page: 1,
         totalPages: 1,
         isLoading: false
@@ -26,6 +28,13 @@ Nafy.App = {
     homeRendered: false,
 
     init() {
+        // Enregistrement du Service Worker PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+
         // Applique le thème sauvegardé
         const settings = Nafy.Storage.getSettings();
         if (settings && settings.theme) {
@@ -45,6 +54,7 @@ Nafy.App = {
 
         if (searchInput) {
             searchInput.addEventListener('input', (e) => this.onSearchInput(e.target.value));
+            searchInput.addEventListener('focus', () => Nafy.UI.renderRecentSearches());
             searchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') this.onSearchSubmit(searchInput.value);
             });
@@ -52,6 +62,7 @@ Nafy.App = {
 
         if (mobileSearchInput) {
             mobileSearchInput.addEventListener('input', (e) => this.onSearchInput(e.target.value));
+            mobileSearchInput.addEventListener('focus', () => Nafy.UI.renderRecentSearches());
             mobileSearchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') this.onSearchSubmit(mobileSearchInput.value);
             });
@@ -67,13 +78,27 @@ Nafy.App = {
             });
         }
 
-        // Touche Échap
+        // Fermeture des modales avec Échap
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 Nafy.UI.closeInfoModal();
                 Nafy.UI.closeSettingsModal();
+                if (Nafy.Player && Nafy.Player.isCinemaMode) {
+                    Nafy.Player.toggleCinemaMode(false);
+                }
             }
         });
+    },
+
+    toggleMobileSearch() {
+        const drawer = document.getElementById('mobileSearchDrawer');
+        if (!drawer) return;
+        drawer.classList.toggle('open');
+        if (drawer.classList.contains('open')) {
+            const input = document.getElementById('mobileSearchInput');
+            if (input) input.focus();
+            Nafy.UI.renderRecentSearches();
+        }
     },
 
     // ================= RENDU DE L'ACCUEIL =================
@@ -210,7 +235,7 @@ Nafy.App = {
         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     },
 
-    // ================= CATALOGUE & FILTRES =================
+    // ================= CATALOGUE & FILTRES AVANCÉS =================
     async loadCatalog(type, title) {
         this.browseState.type = type;
         this.browseState.title = title;
@@ -261,17 +286,17 @@ Nafy.App = {
         const spinner = loadMoreBtn ? loadMoreBtn.querySelector('.loading-icon') : null;
         if (spinner) spinner.style.display = 'inline-block';
 
-        const { type, genreId, providerId, page, sortBy } = this.browseState;
+        const { type, genreId, providerId, page, sortBy, year, minRating } = this.browseState;
         let fetchPromise;
 
         if (type === 'movie') {
-            fetchPromise = Nafy.Api.getPopularMovies(page, sortBy);
+            fetchPromise = Nafy.Api.getPopularMovies(page, sortBy, year, minRating);
         } else if (type === 'tv') {
-            fetchPromise = Nafy.Api.getPopularTv(page, sortBy);
+            fetchPromise = Nafy.Api.getPopularTv(page, sortBy, year, minRating);
         } else if (type === 'trending') {
             fetchPromise = Nafy.Api.getTrending('all', 'week');
         } else if (type === 'genre') {
-            fetchPromise = Nafy.Api.getByGenre(genreId, 'movie', page, sortBy);
+            fetchPromise = Nafy.Api.getByGenre(genreId, 'movie', page, sortBy, year, minRating);
         } else if (type === 'provider') {
             fetchPromise = Nafy.Api.getByProvider(providerId, 'movie', page);
         }
@@ -295,7 +320,7 @@ Nafy.App = {
                     loadMoreBtn.style.display = this.browseState.page < this.browseState.totalPages ? 'inline-flex' : 'none';
                 }
             } else if (reset) {
-                grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: 40px;">Aucun contenu trouvé dans cette catégorie.</p>';
+                grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: 40px;">Aucun contenu trouvé avec ces critères de filtre.</p>';
                 if (loadMoreBtn) loadMoreBtn.style.display = 'none';
             }
         } catch (e) {
@@ -319,6 +344,147 @@ Nafy.App = {
         this.fetchCatalog(true);
     },
 
+    onYearFilterChange(yearVal) {
+        this.browseState.year = yearVal || null;
+        this.browseState.page = 1;
+        this.fetchCatalog(true);
+    },
+
+    onRatingFilterChange(ratingVal) {
+        this.browseState.minRating = ratingVal ? parseFloat(ratingVal) : null;
+        this.browseState.page = 1;
+        this.fetchCatalog(true);
+    },
+
+    // ================= SAGAS & FRANCHISES =================
+    renderSagas() {
+        const grid = document.getElementById('sagasGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        Nafy.Config.SAGAS.forEach(saga => {
+            const card = Nafy.UI.createSagaCard(saga);
+            grid.appendChild(card);
+        });
+    },
+
+    async loadCollection(collectionId) {
+        const titleEl = document.getElementById('collectionTitle');
+        const descEl = document.getElementById('collectionDesc');
+        const bannerEl = document.getElementById('collectionBanner');
+        const grid = document.getElementById('collectionGrid');
+
+        titleEl.textContent = 'Chargement de la franchise...';
+        descEl.textContent = '';
+        grid.innerHTML = Array(6).fill('<div class="skeleton-card"></div>').join('');
+
+        try {
+            const data = await Nafy.Api.getCollection(collectionId);
+            titleEl.textContent = data.name;
+            descEl.textContent = data.overview || 'Retrouvez tous les films officiels de la franchise dans l\'ordre chronologique.';
+            
+            if (data.backdrop_path && bannerEl) {
+                bannerEl.style.backgroundImage = `url('${Nafy.Config.TMDB_BACKDROP_BASE}${data.backdrop_path}')`;
+            }
+
+            grid.innerHTML = '';
+            if (data.parts && data.parts.length > 0) {
+                // Tri chronologique par date de sortie
+                const sorted = data.parts.sort((a, b) => {
+                    const dateA = a.release_date || '9999';
+                    const dateB = b.release_date || '9999';
+                    return dateA.localeCompare(dateB);
+                });
+
+                sorted.forEach(item => {
+                    const card = Nafy.UI.createMediaCard(item, 'movie');
+                    grid.appendChild(card);
+                });
+            } else {
+                grid.innerHTML = '<p class="text-muted">Aucun film répertorié dans cette collection.</p>';
+            }
+        } catch (e) {
+            console.error("Erreur collection :", e);
+            titleEl.textContent = 'Erreur lors du chargement de la collection';
+        }
+    },
+
+    // ================= FILMOGRAPHIE (ACTEURS / RÉALISATEURS) =================
+    async loadPersonFilmography(personId, personName) {
+        const titleEl = document.getElementById('personNameTitle');
+        const bioEl = document.getElementById('personBioText');
+        const photoEl = document.getElementById('personPhotoImg');
+        const grid = document.getElementById('personCreditsGrid');
+
+        titleEl.textContent = decodeURIComponent(personName);
+        bioEl.textContent = 'Chargement de la biographie...';
+        grid.innerHTML = Array(8).fill('<div class="skeleton-card"></div>').join('');
+
+        try {
+            const [personData, creditsData] = await Promise.all([
+                Nafy.Api.getPersonDetails(personId),
+                Nafy.Api.getPersonCredits(personId)
+            ]);
+
+            titleEl.textContent = personData.name;
+            bioEl.textContent = personData.biography || `Filmographie et œuvres de ${personData.name}.`;
+            
+            if (photoEl) {
+                photoEl.src = personData.profile_path 
+                    ? `${Nafy.Config.TMDB_IMAGE_BASE}${personData.profile_path}` 
+                    : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60';
+            }
+
+            grid.innerHTML = '';
+            const allWorks = [...(creditsData.cast || []), ...(creditsData.crew || [])];
+            
+            // Élimine les doublons et trie par popularité
+            const unique = [];
+            const seenIds = new Set();
+            allWorks.forEach(w => {
+                if (!seenIds.has(w.id)) {
+                    seenIds.add(w.id);
+                    unique.push(w);
+                }
+            });
+
+            unique.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+
+            if (unique.length > 0) {
+                unique.slice(0, 30).forEach(item => {
+                    const mediaType = item.media_type || (item.name ? 'tv' : 'movie');
+                    const card = Nafy.UI.createMediaCard(item, mediaType);
+                    grid.appendChild(card);
+                });
+            } else {
+                grid.innerHTML = '<p class="text-muted">Aucune œuvre trouvée.</p>';
+            }
+        } catch (e) {
+            console.error("Erreur filmographie :", e);
+        }
+    },
+
+    // ================= MES TITRES NOTÉS =================
+    renderRatings() {
+        const grid = document.getElementById('ratingsGrid');
+        const empty = document.getElementById('emptyRatings');
+        const ratings = Nafy.Storage.getRatings();
+        const list = Object.values(ratings);
+
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (list.length > 0) {
+            if (empty) empty.style.display = 'none';
+            list.forEach(item => {
+                const card = Nafy.UI.createMediaCard(item, item.media_type || 'movie');
+                grid.appendChild(card);
+            });
+        } else {
+            if (empty) empty.style.display = 'block';
+        }
+    },
+
     // ================= RECHERCHE EN TEMPS RÉEL =================
     onSearchInput(val) {
         const clearBtn = document.getElementById('clearSearchBtn');
@@ -334,6 +500,7 @@ Nafy.App = {
 
     onSearchSubmit(val) {
         if (!val || val.trim().length === 0) return;
+        Nafy.Storage.addRecentSearch(val.trim());
         Nafy.Router.navigate(`search/${encodeURIComponent(val.trim())}`);
     },
 
@@ -342,6 +509,9 @@ Nafy.App = {
         document.getElementById('searchQueryLabel').textContent = `"${query}"`;
         const countLabel = document.getElementById('searchResultsCount');
         const grid = document.getElementById('searchResultsGrid');
+
+        Nafy.Storage.addRecentSearch(query);
+        Nafy.UI.renderRecentSearches();
 
         countLabel.textContent = 'Recherche en cours...';
         grid.innerHTML = Array(8).fill('<div class="skeleton-card"></div>').join('');
