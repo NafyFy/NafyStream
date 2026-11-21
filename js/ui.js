@@ -128,14 +128,19 @@ Nafy.UI = {
         card.dataset.category = saga.category || 'all';
         card.dataset.name = (saga.name || '').toLowerCase();
         
+        const countLabel = saga.count > 1 ? `${saga.count} films` : `${saga.count} film`;
+        
         card.innerHTML = `
-            <div class="saga-backdrop" style="background-image: url('${saga.backdrop}');">
-                <div class="saga-overlay"></div>
-                <div class="saga-content">
-                    <span class="saga-badge"><i class="fa-solid ${saga.icon}"></i> Franchise</span>
-                    <h3 class="saga-name">${this.escapeHtml(saga.name)}</h3>
-                    <p class="saga-count">${saga.count} films officiels</p>
+            <div class="saga-backdrop" style="background-image: url('${saga.backdrop}');"></div>
+            <div class="saga-overlay"></div>
+            <div class="saga-content">
+                <div class="saga-meta-row">
+                    <span class="saga-pill-tag"><i class="fa-solid ${saga.icon}"></i> ${countLabel}</span>
                 </div>
+                <h3 class="saga-name">${this.escapeHtml(saga.name)}</h3>
+            </div>
+            <div class="saga-hover-action">
+                <span class="saga-hover-btn"><i class="fa-solid fa-arrow-right"></i></span>
             </div>
         `;
         card.onclick = () => {

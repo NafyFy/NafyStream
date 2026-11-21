@@ -1265,7 +1265,69 @@
     color: var(--primary);
 }
 
-/* ================= SAGAS & FRANCHISES ================= */
+/* ================= SAGAS SPOTLIGHT & FRANCHISES ================= */
+.sagas-spotlight-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center 30%;
+    min-height: 280px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-end;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
+}
+.sagas-spotlight-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(8, 10, 15, 0.95) 0%, rgba(8, 10, 15, 0.6) 50%, rgba(8, 10, 15, 0.2) 100%),
+                radial-gradient(circle at right center, transparent 40%, rgba(8, 10, 15, 0.8) 100%);
+}
+.sagas-spotlight-content {
+    position: relative;
+    z-index: 2;
+    padding: 32px;
+    max-width: 640px;
+}
+.sagas-spotlight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    margin-bottom: 12px;
+}
+.sagas-spotlight-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+}
+.sagas-spotlight-desc {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Sagas Toolbar */
 .sagas-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -1278,23 +1340,31 @@
 }
 .sagas-categories-scroll {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 4px 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.sagas-categories-scroll::-webkit-scrollbar {
+    display: none;
 }
 .saga-pill-btn {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     color: var(--text-secondary);
-    padding: 7px 14px;
+    padding: 8px 16px;
     border-radius: var(--radius-full);
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
+    white-space: nowrap;
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
 }
 .saga-pill-btn:hover {
     color: var(--text-primary);
@@ -1305,23 +1375,31 @@
     background: var(--primary);
     border-color: var(--primary);
     color: #fff;
-    box-shadow: 0 4px 12px var(--primary-glow);
+    box-shadow: 0 4px 14px var(--primary-glow);
+}
+.pill-count {
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 0.72rem;
+    padding: 1px 6px;
+    border-radius: var(--radius-full);
+    font-weight: 700;
 }
 .sagas-search-wrapper {
     position: relative;
-    min-width: 240px;
+    min-width: 250px;
 }
 .sagas-search-icon {
     position: absolute;
-    left: 12px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
     font-size: 0.85rem;
+    pointer-events: none;
 }
 .sagas-search-input {
     width: 100%;
-    padding: 8px 14px 8px 34px;
+    padding: 9px 16px 9px 36px;
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-full);
@@ -1332,67 +1410,239 @@
 }
 .sagas-search-input:focus {
     border-color: var(--primary);
+    background: var(--bg-surface-elevated);
     box-shadow: 0 0 0 2px var(--primary-glow);
 }
+
+/* Sagas Grid & Cards (16:9 proportionné & animé) */
 .sagas-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 10px 0 30px;
+    gap: 22px;
+    padding: 6px 0 40px;
 }
 .saga-card {
-    height: 180px;
+    aspect-ratio: 16 / 9;
     border-radius: var(--radius-md);
     overflow: hidden;
     position: relative;
     cursor: pointer;
     border: 1px solid var(--border-subtle);
-    transition: var(--transition);
+    background: var(--bg-card);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                border-color 0.35s ease, 
+                box-shadow 0.35s ease;
 }
 .saga-card:hover {
-    transform: translateY(-4px) scale(1.02);
+    transform: translateY(-5px) scale(1.02);
     border-color: var(--primary);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4), 0 0 18px var(--primary-glow);
 }
 .saga-backdrop {
     width: 100%;
     height: 100%;
     background-size: cover;
     background-position: center;
-    position: relative;
+    position: absolute;
+    inset: 0;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.saga-card:hover .saga-backdrop {
+    transform: scale(1.08);
 }
 .saga-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(9, 10, 15, 0.2) 0%, rgba(9, 10, 15, 0.85) 75%, var(--bg-surface) 100%);
+    background: linear-gradient(180deg, rgba(8, 10, 15, 0.1) 0%, rgba(8, 10, 15, 0.5) 55%, rgba(8, 10, 15, 0.95) 100%);
+    transition: background 0.35s ease;
+}
+.saga-card:hover .saga-overlay {
+    background: linear-gradient(180deg, rgba(8, 10, 15, 0.05) 0%, rgba(8, 10, 15, 0.4) 45%, rgba(8, 10, 15, 0.98) 100%);
 }
 .saga-content {
     position: absolute;
-    bottom: 16px;
-    left: 18px;
-    right: 18px;
+    bottom: 14px;
+    left: 16px;
+    right: 48px;
     z-index: 2;
+    transition: transform 0.35s ease;
 }
-.saga-badge {
-    display: inline-block;
-    background: var(--primary);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: var(--radius-xs);
-    text-transform: uppercase;
+.saga-card:hover .saga-content {
+    transform: translateY(-2px);
+}
+.saga-meta-row {
     margin-bottom: 6px;
 }
+.saga-pill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(12, 14, 20, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+}
+.saga-pill-tag i {
+    color: var(--primary);
+}
 .saga-name {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 800;
     color: #fff;
-    margin-bottom: 2px;
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
-.saga-count {
-    font-size: 0.8rem;
+.saga-hover-action {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    z-index: 2;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.saga-card:hover .saga-hover-action {
+    opacity: 1;
+    transform: translateX(0);
+}
+.saga-hover-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* ================= COLLECTION HERO BANNER ================= */
+.collection-hero-banner {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center 25%;
+    min-height: 340px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: flex-end;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
+}
+.collection-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(8, 10, 15, 0.98) 0%, rgba(8, 10, 15, 0.7) 50%, rgba(8, 10, 15, 0.3) 100%),
+                radial-gradient(circle at top right, transparent 30%, rgba(8, 10, 15, 0.85) 100%);
+}
+.collection-hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 36px 32px 32px;
+    max-width: 800px;
+}
+.collection-back-btn {
+    margin-bottom: 16px;
+    background: rgba(12, 14, 20, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-subtle);
+}
+.collection-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.collection-badge {
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: var(--radius-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.collection-badge-ghost {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-xs);
+}
+.collection-hero-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+}
+.collection-hero-desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 22px;
+    max-width: 680px;
+}
+.collection-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.collection-timeline-header {
+    margin: 20px 0 16px;
+}
+.timeline-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.timeline-subtitle {
     color: var(--text-muted);
+    font-size: 0.88rem;
+}
+.collection-step-pill {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(10, 12, 18, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    z-index: 3;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    pointer-events: none;
+}
+.collection-step-pill span {
+    color: var(--primary);
+    font-weight: 800;
 }
 
 .modal-saga-link {

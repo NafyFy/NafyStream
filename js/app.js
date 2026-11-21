@@ -360,17 +360,45 @@ Nafy.App = {
     renderSagas() {
         const grid = document.getElementById('sagasGrid');
         if (!grid) return;
-        grid.innerHTML = '';
 
+        // Met en avant une grande saga en haut de page
+        this.renderSagasSpotlight();
+
+        grid.innerHTML = '';
         Nafy.Config.SAGAS.forEach(saga => {
             const card = Nafy.UI.createSagaCard(saga);
             grid.appendChild(card);
         });
 
         const allBtn = document.querySelector('.saga-pill-btn[data-cat="all"]');
-        if (allBtn) allBtn.textContent = `Toutes (${Nafy.Config.SAGAS.length})`;
+        if (allBtn) allBtn.innerHTML = `Toutes <span class="pill-count">${Nafy.Config.SAGAS.length}</span>`;
 
         this.filterSagas();
+    },
+
+    renderSagasSpotlight() {
+        const container = document.getElementById('sagasSpotlight');
+        if (!container) return;
+
+        // Franchise vedette mise en avant
+        const featured = Nafy.Config.SAGAS.find(s => s.id === 10) || Nafy.Config.SAGAS[0];
+        if (!featured) return;
+
+        container.innerHTML = `
+            <div class="sagas-spotlight-card" style="background-image: url('${featured.backdrop}');">
+                <div class="sagas-spotlight-overlay"></div>
+                <div class="sagas-spotlight-content">
+                    <span class="sagas-spotlight-badge"><i class="fa-solid fa-sparkles"></i> Franchise en Vedette</span>
+                    <h2 class="sagas-spotlight-title">${featured.name}</h2>
+                    <p class="sagas-spotlight-desc">Revivez l'intégralité des 9 épisodes de la plus mythique saga spatiale du cinéma, de la Menace Fantôme à l'Ascension de Skywalker.</p>
+                    <div class="sagas-spotlight-actions">
+                        <button class="btn btn-primary" onclick="Nafy.Router.navigate('collection/${featured.id}')">
+                            <i class="fa-solid fa-play"></i> Explorer l'intégrale (${featured.count} films)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
     },
 
     setSagaCategory(category) {
@@ -407,19 +435,25 @@ Nafy.App = {
         const titleEl = document.getElementById('collectionTitle');
         const descEl = document.getElementById('collectionDesc');
         const bannerEl = document.getElementById('collectionBanner');
+        const countBadge = document.getElementById('collectionCountBadge');
+        const yearsBadge = document.getElementById('collectionYearsBadge');
+        const startBtn = document.getElementById('collectionStartBtn');
         const grid = document.getElementById('collectionGrid');
 
         titleEl.textContent = 'Chargement de la franchise...';
         descEl.textContent = '';
+        if (startBtn) startBtn.style.display = 'none';
         grid.innerHTML = Array(6).fill('<div class="skeleton-card"></div>').join('');
 
         try {
             const data = await Nafy.Api.getCollection(collectionId);
             titleEl.textContent = data.name;
-            descEl.textContent = data.overview || 'Retrouvez tous les films officiels de la franchise dans l\'ordre chronologique.';
+            descEl.textContent = data.overview || "Retrouvez tous les volets officiels de la franchise dans l'ordre chronologique de sortie en salles.";
             
             if (data.backdrop_path && bannerEl) {
                 bannerEl.style.backgroundImage = `url('${Nafy.Config.TMDB_BACKDROP_BASE}${data.backdrop_path}')`;
+            } else if (data.poster_path && bannerEl) {
+                bannerEl.style.backgroundImage = `url('${Nafy.Config.TMDB_IMAGE_BASE}${data.poster_path}')`;
             }
 
             grid.innerHTML = '';
@@ -431,8 +465,37 @@ Nafy.App = {
                     return dateA.localeCompare(dateB);
                 });
 
-                sorted.forEach(item => {
+                if (countBadge) {
+                    countBadge.innerHTML = `<i class="fa-solid fa-film"></i> ${sorted.length} film${sorted.length > 1 ? 's' : ''}`;
+                }
+
+                const years = sorted
+                    .map(p => (p.release_date || '').substring(0, 4))
+                    .filter(y => y.length === 4);
+                if (years.length > 0 && yearsBadge) {
+                    const minYear = years[0];
+                    const maxYear = years[years.length - 1];
+                    yearsBadge.textContent = minYear === maxYear ? minYear : `${minYear} – ${maxYear}`;
+                }
+
+                // Bouton pour lancer immédiatement le 1er volet
+                if (startBtn && sorted[0]) {
+                    startBtn.style.display = 'inline-flex';
+                    startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Lancer le 1er volet (${(sorted[0].release_date || '').substring(0, 4)})`;
+                    startBtn.onclick = () => {
+                        Nafy.Router.navigate(`watch/movie/${sorted[0].id}`);
+                    };
+                }
+
+                sorted.forEach((item, idx) => {
                     const card = Nafy.UI.createMediaCard(item, 'movie');
+                    // Badge chronologique (#1, #2...)
+                    const year = (item.release_date || '').substring(0, 4);
+                    const pill = document.createElement('div');
+                    pill.className = 'collection-step-pill';
+                    pill.innerHTML = `<span>#${idx + 1}</span> ${year ? `• ${year}` : ''}`;
+                    const thumb = card.querySelector('.media-poster-wrapper') || card.querySelector('.media-card-poster') || card;
+                    thumb.appendChild(pill);
                     grid.appendChild(card);
                 });
             } else {

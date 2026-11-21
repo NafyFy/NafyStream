@@ -278,47 +278,67 @@
         <section id="sagas-section" class="view-section" style="display: none;">
             <div class="section-page-header">
                 <div>
-                    <h1 class="section-title"><i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> Grandes Sagas & Franchises</h1>
-                    <p class="section-subtitle">Découvrez et regardez les plus grands univers cinématographiques dans l'ordre chronologique</p>
+                    <h1 class="section-title"><i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> Grandes Sagas & Univers Culte</h1>
+                    <p class="section-subtitle">Les intégrales mythiques du 7ème art dans l'ordre chronologique de sortie</p>
                 </div>
             </div>
 
-            <!-- Barre de filtres par catégories et recherche de franchise -->
+            <!-- Spotlight Franchise en vedette -->
+            <div id="sagasSpotlight"></div>
+
+            <!-- Barre de filtres et recherche -->
             <div class="sagas-toolbar">
                 <div class="sagas-categories-scroll">
                     <button class="saga-pill-btn active" data-cat="all" onclick="Nafy.App.setSagaCategory('all')">Toutes</button>
-                    <button class="saga-pill-btn" data-cat="action" onclick="Nafy.App.setSagaCategory('action')"><i class="fa-solid fa-car-side"></i> Action & Espionnage</button>
+                    <button class="saga-pill-btn" data-cat="action" onclick="Nafy.App.setSagaCategory('action')"><i class="fa-solid fa-car-side"></i> Action & Vitesse</button>
                     <button class="saga-pill-btn" data-cat="scifi" onclick="Nafy.App.setSagaCategory('scifi')"><i class="fa-solid fa-rocket"></i> Sci-Fi & Espace</button>
                     <button class="saga-pill-btn" data-cat="superhero" onclick="Nafy.App.setSagaCategory('superhero')"><i class="fa-solid fa-mask"></i> Super-Héros</button>
                     <button class="saga-pill-btn" data-cat="adventure" onclick="Nafy.App.setSagaCategory('adventure')"><i class="fa-solid fa-compass"></i> Aventure & Fantasy</button>
-                    <button class="saga-pill-btn" data-cat="horror" onclick="Nafy.App.setSagaCategory('horror')"><i class="fa-solid fa-ghost"></i> Horreur & Frissons</button>
-                    <button class="saga-pill-btn" data-cat="animation" onclick="Nafy.App.setSagaCategory('animation')"><i class="fa-solid fa-wand-magic-sparkles"></i> Animation & Culte</button>
+                    <button class="saga-pill-btn" data-cat="horror" onclick="Nafy.App.setSagaCategory('horror')"><i class="fa-solid fa-ghost"></i> Frissons & Horreur</button>
+                    <button class="saga-pill-btn" data-cat="animation" onclick="Nafy.App.setSagaCategory('animation')"><i class="fa-solid fa-wand-magic-sparkles"></i> Animation Culte</button>
                 </div>
                 <div class="sagas-search-wrapper">
                     <i class="fa-solid fa-magnifying-glass sagas-search-icon"></i>
-                    <input type="text" id="sagasSearchInput" class="sagas-search-input" placeholder="Rechercher une saga..." oninput="Nafy.App.filterSagas()">
+                    <input type="text" id="sagasSearchInput" class="sagas-search-input" placeholder="Filtrer une franchise..." oninput="Nafy.App.filterSagas()">
                 </div>
             </div>
 
             <div id="sagasGrid" class="sagas-grid"></div>
             <div id="sagasEmptyMsg" class="empty-state" style="display:none; padding:40px 20px;">
                 <i class="fa-solid fa-film" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:12px;"></i>
-                <p>Aucune franchise ne correspond à votre filtre.</p>
+                <p>Aucune franchise ne correspond à votre recherche.</p>
             </div>
         </section>
 
         <!-- ================= SECTION DÉTAILS D'UNE COLLECTION ================= -->
         <section id="collection-section" class="view-section" style="display: none;">
-            <div class="section-page-header">
-                <div>
-                    <button class="btn btn-sm btn-ghost" onclick="Nafy.Router.navigate('sagas')" style="margin-bottom:8px;">
+            <div class="collection-hero-banner" id="collectionBanner">
+                <div class="collection-hero-overlay"></div>
+                <div class="collection-hero-content">
+                    <button class="btn btn-sm btn-ghost collection-back-btn" onclick="Nafy.Router.navigate('sagas')">
                         <i class="fa-solid fa-arrow-left"></i> Toutes les sagas
                     </button>
-                    <h1 id="collectionTitle" class="section-title">Nom de la Saga</h1>
-                    <p id="collectionDesc" class="section-subtitle">Description...</p>
+                    <div class="collection-meta-tags">
+                        <span id="collectionCountBadge" class="collection-badge"><i class="fa-solid fa-film"></i> Intégrale</span>
+                        <span id="collectionYearsBadge" class="collection-badge-ghost">Chronologie officielle</span>
+                    </div>
+                    <h1 id="collectionTitle" class="collection-hero-title">Nom de la Saga</h1>
+                    <p id="collectionDesc" class="collection-hero-desc">Description de la saga...</p>
+                    <div class="collection-hero-actions">
+                        <button id="collectionStartBtn" class="btn btn-primary" style="display:none;">
+                            <i class="fa-solid fa-play"></i> Lancer le 1er volet
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div id="collectionGrid" class="media-grid"></div>
+
+            <div class="collection-body-container">
+                <div class="collection-timeline-header">
+                    <h2 class="timeline-title"><i class="fa-solid fa-timeline" style="color:var(--primary);"></i> Chronologie officielle des films</h2>
+                    <p class="timeline-subtitle">Regardez les volets de la saga dans leur ordre de parution au cinéma</p>
+                </div>
+                <div id="collectionGrid" class="media-grid"></div>
+            </div>
         </section>
 
         <!-- ================= SECTION FILMOGRAPHIE (ACTEURS / RÉALISATEURS) ================= -->
