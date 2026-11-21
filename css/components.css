@@ -576,9 +576,11 @@
     display: flex;
     gap: 18px;
     overflow-x: auto;
+    overflow-y: hidden;
     scroll-behavior: smooth;
     padding: 10px 4px 20px;
     scrollbar-width: none;
+    align-items: flex-start;
 }
 .media-carousel::-webkit-scrollbar {
     display: none;
@@ -625,20 +627,30 @@
 
 /* ================= CARTES DE FILM / SÉRIE ================= */
 .media-card {
-    flex: 0 0 185px;
-    background: transparent;
-    border-radius: 6px;
+    flex: 0 0 180px;
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
     position: relative;
     cursor: pointer;
-    border: none;
-    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                box-shadow 0.25s ease, 
+                border-color 0.25s ease;
     display: flex;
     flex-direction: column;
     user-select: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
 }
 
 .media-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
+    border-color: var(--border-active);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.55);
     z-index: 5;
 }
 
@@ -646,15 +658,8 @@
     position: relative;
     aspect-ratio: 2 / 3;
     width: 100%;
-    background: #141722;
-    border-radius: 6px;
+    background: #0f121b;
     overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-    transition: box-shadow 0.25s ease;
-}
-
-.media-card:hover .card-poster-wrapper {
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
 }
 
 .card-poster-wrapper img {
@@ -666,13 +671,13 @@
 }
 
 .media-card:hover .card-poster-wrapper img {
-    transform: scale(1.04);
+    transform: scale(1.05);
 }
 
 .card-hover-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.6) 100%);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.65) 100%);
     opacity: 0;
     display: flex;
     align-items: center;
@@ -688,14 +693,14 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
-    color: #000;
+    background: var(--primary);
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-    transform: scale(0.9);
+    box-shadow: 0 4px 14px var(--primary-glow);
+    transform: scale(0.85);
     transition: transform 0.2s ease;
 }
 
@@ -750,17 +755,26 @@
 }
 
 .card-info {
-    padding: 8px 2px 2px;
+    padding: 10px 12px 12px;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .card-title {
     font-size: 0.88rem;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-main);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 3px;
+    width: 100%;
+    display: block;
+    margin-bottom: 2px;
 }
 
 .card-meta-line {
@@ -768,8 +782,12 @@
     align-items: center;
     gap: 6px;
     font-size: 0.76rem;
-    color: #8b92a4;
+    color: var(--text-dim);
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .meta-dot {
@@ -842,6 +860,8 @@
 .media-grid .media-card {
     flex: unset;
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .section-page-header {
