@@ -388,12 +388,12 @@ Nafy.App = {
             <div class="sagas-spotlight-card" style="background-image: url('${featured.backdrop}');">
                 <div class="sagas-spotlight-overlay"></div>
                 <div class="sagas-spotlight-content">
-                    <span class="sagas-spotlight-badge"><i class="fa-solid fa-sparkles"></i> Franchise en Vedette</span>
+                    <span class="sagas-spotlight-badge">Collection à la une</span>
                     <h2 class="sagas-spotlight-title">${featured.name}</h2>
-                    <p class="sagas-spotlight-desc">Revivez l'intégralité des 9 épisodes de la plus mythique saga spatiale du cinéma, de la Menace Fantôme à l'Ascension de Skywalker.</p>
+                    <p class="sagas-spotlight-desc">L'intégrale des 9 épisodes de la saga Skywalker dans l'ordre chronologique officiel.</p>
                     <div class="sagas-spotlight-actions">
-                        <button class="btn btn-primary" onclick="Nafy.Router.navigate('collection/${featured.id}')">
-                            <i class="fa-solid fa-play"></i> Explorer l'intégrale (${featured.count} films)
+                        <button class="btn btn-hero-primary" onclick="Nafy.Router.navigate('collection/${featured.id}')">
+                            <i class="fa-solid fa-play"></i> Découvrir l'intégrale
                         </button>
                     </div>
                 </div>

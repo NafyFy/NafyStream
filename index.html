@@ -28,52 +28,37 @@
         <div class="nav-container">
             <div class="nav-left">
                 <a href="#home" class="brand-logo" onclick="Nafy.Router.navigate('home'); return false;">
-                    <span class="logo-icon"><i class="fa-solid fa-play"></i></span>
                     <span class="logo-text">NAFY<span class="logo-accent">STREAM</span></span>
                 </a>
                 
                 <nav class="main-nav">
-                    <button class="nav-link active" data-target="home" onclick="Nafy.Router.navigate('home')">
-                        <i class="fa-solid fa-house"></i> Accueil
-                    </button>
-                    <button class="nav-link" data-target="movies" onclick="Nafy.Router.navigate('movies')">
-                        <i class="fa-solid fa-film"></i> Films
-                    </button>
-                    <button class="nav-link" data-target="series" onclick="Nafy.Router.navigate('series')">
-                        <i class="fa-solid fa-tv"></i> Séries
-                    </button>
-                    <button class="nav-link" data-target="sagas" onclick="Nafy.Router.navigate('sagas')">
-                        <i class="fa-solid fa-layer-group"></i> Sagas
-                    </button>
-                    <button class="nav-link" data-target="trending" onclick="Nafy.Router.navigate('trending')">
-                        <i class="fa-solid fa-fire-flame-curved"></i> Tendances
-                    </button>
-                    <button class="nav-link" data-target="ratings" onclick="Nafy.Router.navigate('ratings')">
-                        <i class="fa-solid fa-star gold"></i> Mes Notes
-                    </button>
+                    <button class="nav-link active" data-target="home" onclick="Nafy.Router.navigate('home')">Accueil</button>
+                    <button class="nav-link" data-target="movies" onclick="Nafy.Router.navigate('movies')">Films</button>
+                    <button class="nav-link" data-target="series" onclick="Nafy.Router.navigate('series')">Séries</button>
+                    <button class="nav-link" data-target="sagas" onclick="Nafy.Router.navigate('sagas')">Sagas</button>
+                    <button class="nav-link" data-target="trending" onclick="Nafy.Router.navigate('trending')">Tendances</button>
+                    <button class="nav-link" data-target="ratings" onclick="Nafy.Router.navigate('ratings')">Mes Notes</button>
                     <button class="nav-link" data-target="watchlist" onclick="Nafy.Router.navigate('watchlist')">
-                        <i class="fa-solid fa-bookmark"></i> Ma Liste
+                        Ma Liste
                         <span id="watchlist-badge" class="badge-count" style="display:none;">0</span>
                     </button>
                 </nav>
             </div>
 
             <div class="nav-right">
-                <!-- Bouton Surprenez-moi -->
-                <button class="btn btn-sm btn-secondary" onclick="Nafy.UI.triggerRandomSurprise()" title="Piocher un film ou une série au hasard">
-                    <i class="fa-solid fa-dice"></i> <span class="hide-mobile">Surprenez-moi</span>
-                </button>
-
                 <div class="search-bar-wrapper">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="globalSearchInput" placeholder="Rechercher un film, un acteur..." autocomplete="off">
+                    <input type="text" id="globalSearchInput" placeholder="Titres, acteurs, genres..." autocomplete="off">
                     <button id="clearSearchBtn" class="clear-search-btn" title="Effacer"><i class="fa-solid fa-xmark"></i></button>
                 </div>
+                <button class="btn-icon" onclick="Nafy.UI.triggerRandomSurprise()" title="Titre au hasard">
+                    <i class="fa-solid fa-shuffle"></i>
+                </button>
                 <button class="mobile-search-toggle" onclick="Nafy.App.toggleMobileSearch()" title="Recherche">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
-                <button class="btn-icon" onclick="Nafy.UI.openSettingsModal()" title="Paramètres, Statistiques & Thème">
-                    <i class="fa-solid fa-sliders"></i>
+                <button class="btn-icon" onclick="Nafy.UI.openSettingsModal()" title="Paramètres & Thèmes">
+                    <i class="fa-solid fa-gear"></i>
                 </button>
             </div>
         </div>
@@ -82,7 +67,7 @@
         <div id="mobileSearchDrawer" class="mobile-search-drawer">
             <div class="search-bar-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="mobileSearchInput" placeholder="Rechercher un film, un acteur..." autocomplete="off">
+                <input type="text" id="mobileSearchInput" placeholder="Titres, acteurs, genres..." autocomplete="off">
                 <button class="clear-search-btn" onclick="Nafy.App.toggleMobileSearch()"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
@@ -98,26 +83,25 @@
                 <div class="hero-backdrop" id="heroBackdrop"></div>
                 <div class="hero-gradient-overlay"></div>
                 <div class="hero-content">
-                    <div class="hero-badges">
-                        <span class="hero-badge highlight"><i class="fa-solid fa-bolt"></i> NOUVEAUTÉ</span>
-                        <span id="heroTypeBadge" class="hero-badge type">FILM</span>
-                        <span id="heroRatingBadge" class="hero-badge rating"><i class="fa-solid fa-star"></i> 8.5</span>
-                        <span id="heroYearBadge" class="hero-badge year">2026</span>
+                    <div class="hero-meta">
+                        <span id="heroTypeBadge" class="hero-meta-tag">FILM</span>
+                        <span id="heroYearBadge" class="hero-meta-item">2026</span>
+                        <span class="hero-meta-dot">•</span>
+                        <span id="heroRatingBadge" class="hero-meta-rating"><i class="fa-solid fa-star"></i> 8.5</span>
+                        <span class="hero-meta-dot">•</span>
+                        <span class="hero-meta-quality">4K Ultra HD</span>
                     </div>
                     <h1 id="heroTitle" class="hero-title">Chargement des nouveautés...</h1>
                     <div id="heroGenres" class="hero-genres"></div>
                     <p id="heroOverview" class="hero-overview">Sélection des meilleurs titres en haute définition.</p>
                     <div class="hero-actions">
-                        <button id="heroPlayBtn" class="btn btn-primary">
-                            <i class="fa-solid fa-play"></i> Regarder maintenant
+                        <button id="heroPlayBtn" class="btn btn-hero-primary">
+                            <i class="fa-solid fa-play"></i> Regarder
                         </button>
-                        <button id="heroInfoBtn" class="btn btn-secondary">
+                        <button id="heroInfoBtn" class="btn btn-hero-secondary">
                             <i class="fa-solid fa-circle-info"></i> Plus d'infos
                         </button>
-                        <button class="btn btn-secondary" onclick="Nafy.UI.triggerRandomSurprise()" title="Tirage au sort">
-                            <i class="fa-solid fa-dice"></i> Au hasard
-                        </button>
-                        <button id="heroBookmarkBtn" class="btn btn-icon" title="Ajouter à ma liste">
+                        <button id="heroBookmarkBtn" class="btn btn-hero-icon" title="Ajouter à ma liste">
                             <i class="fa-regular fa-bookmark"></i>
                         </button>
                     </div>
@@ -127,7 +111,7 @@
             <!-- Continuer la lecture (Historique persistant) -->
             <div id="resumeSection" class="resume-section" style="display:none;">
                 <div class="row-header">
-                    <h2 class="row-title"><i class="fa-solid fa-clock-rotate-left row-icon"></i> Continuer la lecture</h2>
+                    <h2 class="row-title">Reprendre la lecture</h2>
                 </div>
                 <div class="carousel-wrapper">
                     <button class="carousel-nav prev" onclick="Nafy.App.scrollCarousel('resumeCarousel', -1)" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
@@ -139,9 +123,8 @@
             <!-- Barres de filtres rapides (Genres & Plateformes) -->
             <div class="filter-bars-wrapper">
                 <div class="genre-pill-bar">
-                    <span class="filter-bar-label"><i class="fa-solid fa-tags"></i> Genres :</span>
                     <div class="pill-scroller">
-                        <button class="filter-pill active" onclick="Nafy.Router.navigate('home')">Tous</button>
+                        <button class="filter-pill active" onclick="Nafy.Router.navigate('home')">Tous les genres</button>
                         <button class="filter-pill" onclick="Nafy.Router.navigate('genre/28/Action')">Action</button>
                         <button class="filter-pill" onclick="Nafy.Router.navigate('genre/12/Aventure')">Aventure</button>
                         <button class="filter-pill" onclick="Nafy.Router.navigate('genre/35/Comédie')">Comédie</button>
@@ -154,13 +137,12 @@
                 </div>
 
                 <div class="provider-pill-bar">
-                    <span class="filter-bar-label"><i class="fa-solid fa-tv"></i> Plateformes :</span>
                     <div class="pill-scroller">
-                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/8/Netflix')"><i class="fa-brands fa-neos"></i> Netflix</button>
-                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/119/Amazon%20Prime')"><i class="fa-brands fa-amazon"></i> Prime Video</button>
-                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/337/Disney%2B')"><i class="fa-solid fa-wand-magic-sparkles"></i> Disney+</button>
-                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/381/Canal%2B')"><i class="fa-solid fa-tv"></i> Canal+</button>
-                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/2/Apple%20TV%2B')"><i class="fa-brands fa-apple"></i> Apple TV+</button>
+                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/8/Netflix')">Netflix</button>
+                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/119/Amazon%20Prime')">Prime Video</button>
+                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/337/Disney%2B')">Disney+</button>
+                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/381/Canal%2B')">Canal+</button>
+                        <button class="filter-pill" onclick="Nafy.Router.navigate('provider/2/Apple%20TV%2B')">Apple TV+</button>
                     </div>
                 </div>
             </div>
@@ -168,7 +150,7 @@
             <!-- Top 10 du jour (Style Netflix avec grands chiffres) -->
             <div class="media-row">
                 <div class="row-header">
-                    <h2 class="row-title"><i class="fa-solid fa-ranking-star row-icon gold"></i> Top 10 aujourd'hui en France</h2>
+                    <h2 class="row-title">Top 10 aujourd'hui en France</h2>
                 </div>
                 <div class="carousel-wrapper">
                     <button class="carousel-nav prev" onclick="Nafy.App.scrollCarousel('top10-carousel', -1)" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
@@ -181,7 +163,7 @@
             <div class="rows-container">
                 <div class="media-row">
                     <div class="row-header">
-                        <h2 class="row-title"><i class="fa-solid fa-fire-flame-curved row-icon"></i> Tendances de la semaine</h2>
+                        <h2 class="row-title">Tendances de la semaine</h2>
                         <button class="see-all-btn" onclick="Nafy.Router.navigate('trending')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="carousel-wrapper">
@@ -193,7 +175,7 @@
 
                 <div class="media-row">
                     <div class="row-header">
-                        <h2 class="row-title"><i class="fa-solid fa-film row-icon"></i> Films populaires</h2>
+                        <h2 class="row-title">Films populaires</h2>
                         <button class="see-all-btn" onclick="Nafy.Router.navigate('movies')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="carousel-wrapper">
@@ -205,7 +187,7 @@
 
                 <div class="media-row">
                     <div class="row-header">
-                        <h2 class="row-title"><i class="fa-solid fa-tv row-icon"></i> Séries du moment</h2>
+                        <h2 class="row-title">Séries du moment</h2>
                         <button class="see-all-btn" onclick="Nafy.Router.navigate('series')">Voir tout <i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="carousel-wrapper">
@@ -217,7 +199,7 @@
 
                 <div class="media-row">
                     <div class="row-header">
-                        <h2 class="row-title"><i class="fa-solid fa-star row-icon gold"></i> Les chefs-d'œuvre les mieux notés</h2>
+                        <h2 class="row-title">Les mieux notés</h2>
                     </div>
                     <div class="carousel-wrapper">
                         <button class="carousel-nav prev" onclick="Nafy.App.scrollCarousel('toprated-carousel', -1)"><i class="fa-solid fa-chevron-left"></i></button>
@@ -278,8 +260,8 @@
         <section id="sagas-section" class="view-section" style="display: none;">
             <div class="section-page-header">
                 <div>
-                    <h1 class="section-title"><i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> Grandes Sagas & Univers Culte</h1>
-                    <p class="section-subtitle">Les intégrales mythiques du 7ème art dans l'ordre chronologique de sortie</p>
+                    <h1 class="section-title">Grandes Sagas & Collections</h1>
+                    <p class="section-subtitle">Les intégrales mythiques du cinéma dans l'ordre chronologique de sortie</p>
                 </div>
             </div>
 
@@ -290,12 +272,12 @@
             <div class="sagas-toolbar">
                 <div class="sagas-categories-scroll">
                     <button class="saga-pill-btn active" data-cat="all" onclick="Nafy.App.setSagaCategory('all')">Toutes</button>
-                    <button class="saga-pill-btn" data-cat="action" onclick="Nafy.App.setSagaCategory('action')"><i class="fa-solid fa-car-side"></i> Action & Vitesse</button>
-                    <button class="saga-pill-btn" data-cat="scifi" onclick="Nafy.App.setSagaCategory('scifi')"><i class="fa-solid fa-rocket"></i> Sci-Fi & Espace</button>
-                    <button class="saga-pill-btn" data-cat="superhero" onclick="Nafy.App.setSagaCategory('superhero')"><i class="fa-solid fa-mask"></i> Super-Héros</button>
-                    <button class="saga-pill-btn" data-cat="adventure" onclick="Nafy.App.setSagaCategory('adventure')"><i class="fa-solid fa-compass"></i> Aventure & Fantasy</button>
-                    <button class="saga-pill-btn" data-cat="horror" onclick="Nafy.App.setSagaCategory('horror')"><i class="fa-solid fa-ghost"></i> Frissons & Horreur</button>
-                    <button class="saga-pill-btn" data-cat="animation" onclick="Nafy.App.setSagaCategory('animation')"><i class="fa-solid fa-wand-magic-sparkles"></i> Animation Culte</button>
+                    <button class="saga-pill-btn" data-cat="action" onclick="Nafy.App.setSagaCategory('action')">Action & Vitesse</button>
+                    <button class="saga-pill-btn" data-cat="scifi" onclick="Nafy.App.setSagaCategory('scifi')">Sci-Fi & Espace</button>
+                    <button class="saga-pill-btn" data-cat="superhero" onclick="Nafy.App.setSagaCategory('superhero')">Super-Héros</button>
+                    <button class="saga-pill-btn" data-cat="adventure" onclick="Nafy.App.setSagaCategory('adventure')">Aventure & Fantasy</button>
+                    <button class="saga-pill-btn" data-cat="horror" onclick="Nafy.App.setSagaCategory('horror')">Horreur & Frissons</button>
+                    <button class="saga-pill-btn" data-cat="animation" onclick="Nafy.App.setSagaCategory('animation')">Animation</button>
                 </div>
                 <div class="sagas-search-wrapper">
                     <i class="fa-solid fa-magnifying-glass sagas-search-icon"></i>
@@ -305,7 +287,7 @@
 
             <div id="sagasGrid" class="sagas-grid"></div>
             <div id="sagasEmptyMsg" class="empty-state" style="display:none; padding:40px 20px;">
-                <i class="fa-solid fa-film" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:12px;"></i>
+                <i class="fa-solid fa-film" style="font-size:2rem; color:var(--text-muted); margin-bottom:12px;"></i>
                 <p>Aucune franchise ne correspond à votre recherche.</p>
             </div>
         </section>
@@ -316,10 +298,10 @@
                 <div class="collection-hero-overlay"></div>
                 <div class="collection-hero-content">
                     <button class="btn btn-sm btn-ghost collection-back-btn" onclick="Nafy.Router.navigate('sagas')">
-                        <i class="fa-solid fa-arrow-left"></i> Toutes les sagas
+                        <i class="fa-solid fa-arrow-left"></i> Sagas
                     </button>
                     <div class="collection-meta-tags">
-                        <span id="collectionCountBadge" class="collection-badge"><i class="fa-solid fa-film"></i> Intégrale</span>
+                        <span id="collectionCountBadge" class="collection-badge">Intégrale</span>
                         <span id="collectionYearsBadge" class="collection-badge-ghost">Chronologie officielle</span>
                     </div>
                     <h1 id="collectionTitle" class="collection-hero-title">Nom de la Saga</h1>
@@ -334,8 +316,8 @@
 
             <div class="collection-body-container">
                 <div class="collection-timeline-header">
-                    <h2 class="timeline-title"><i class="fa-solid fa-timeline" style="color:var(--primary);"></i> Chronologie officielle des films</h2>
-                    <p class="timeline-subtitle">Regardez les volets de la saga dans leur ordre de parution au cinéma</p>
+                    <h2 class="timeline-title">Chronologie officielle des films</h2>
+                    <p class="timeline-subtitle">Dans l'ordre de sortie au cinéma</p>
                 </div>
                 <div id="collectionGrid" class="media-grid"></div>
             </div>
@@ -354,7 +336,7 @@
                 </div>
             </div>
             <h2 class="section-subtitle-heading" style="font-size:1.3rem; margin-bottom:16px;">
-                <i class="fa-solid fa-clapperboard"></i> Filmographie complète
+                Filmographie
             </h2>
             <div id="personCreditsGrid" class="media-grid"></div>
         </section>
@@ -363,16 +345,16 @@
         <section id="ratings-section" class="view-section" style="display: none;">
             <div class="section-page-header">
                 <div>
-                    <h1 class="section-title"><i class="fa-solid fa-star gold"></i> Mes Titres Notés</h1>
-                    <p class="section-subtitle">Retrouvez tous les films et séries que vous avez évalués</p>
+                    <h1 class="section-title">Mes Titres Notés</h1>
+                    <p class="section-subtitle">Vos avis et évaluations personnelles</p>
                 </div>
             </div>
             <div id="ratingsGrid" class="media-grid"></div>
             <div id="emptyRatings" class="empty-state" style="display:none;">
                 <div class="empty-icon"><i class="fa-regular fa-star"></i></div>
-                <h3>Aucun titre noté pour le moment</h3>
-                <p>Attribuez des étoiles à vos films visionnés pour les retrouver réunis ici.</p>
-                <button class="btn btn-primary" onclick="Nafy.Router.navigate('home')">Parcourir les films</button>
+                <h3>Aucun titre noté</h3>
+                <p>Attribuez des étoiles à vos films visionnés pour les retrouver ici.</p>
+                <button class="btn btn-primary" onclick="Nafy.Router.navigate('home')">Découvrir les titres</button>
             </div>
         </section>
 
@@ -380,8 +362,8 @@
         <section id="watchlist-section" class="view-section" style="display: none;">
             <div class="section-page-header">
                 <div>
-                    <h1 class="section-title"><i class="fa-solid fa-bookmark gold"></i> Ma Liste</h1>
-                    <p class="section-subtitle">Vos films et séries enregistrés pour plus tard</p>
+                    <h1 class="section-title">Ma Liste</h1>
+                    <p class="section-subtitle">Vos films et séries enregistrés</p>
                 </div>
                 <button class="btn btn-sm btn-ghost" onclick="Nafy.App.clearWatchlist()" id="clearWatchlistBtn">
                     <i class="fa-regular fa-trash-can"></i> Vider la liste
@@ -393,8 +375,8 @@
             <div id="emptyWatchlist" class="empty-state" style="display:none;">
                 <div class="empty-icon"><i class="fa-regular fa-bookmark"></i></div>
                 <h3>Votre liste est vide</h3>
-                <p>Cliquez sur l'icône de signet sur une affiche pour enregistrer des titres ici.</p>
-                <button class="btn btn-primary" onclick="Nafy.Router.navigate('home')">Découvrir des nouveautés</button>
+                <p>Enregistrez des films ou des séries pour les retrouver plus tard.</p>
+                <button class="btn btn-primary" onclick="Nafy.Router.navigate('home')">Explorer les nouveautés</button>
             </div>
         </section>
 
@@ -450,14 +432,14 @@
             <div class="player-server-panel">
                 <div class="player-audio-row">
                     <div class="audio-label">
-                        <i class="fa-solid fa-headphones"></i> Version Audio prioritaire :
+                        Langue audio :
                     </div>
                     <div class="audio-toggle-group">
                         <button class="audio-tab-btn active" data-audio="vf" onclick="Nafy.Player.setPreferredAudio('vf')">
-                            <span class="flag-icon">🇫🇷</span> Version Française (VF)
+                            Version française (VF)
                         </button>
                         <button class="audio-tab-btn" data-audio="vostfr" onclick="Nafy.Player.setPreferredAudio('vostfr')">
-                            <span class="flag-icon">💬</span> Sous-titré Français (VOSTFR)
+                            Sous-titré français (VOSTFR)
                         </button>
                     </div>
                 </div>
@@ -467,7 +449,7 @@
 
                 <div class="server-selection-row">
                     <div class="server-label">
-                        <i class="fa-solid fa-server"></i> Choisir une source vidéo :
+                        Sources de lecture disponibles :
                     </div>
                     <div id="serverButtonsContainer" class="server-buttons">
                         <!-- Rendu dynamique par Nafy.Player.renderServerButtons() -->
@@ -478,7 +460,7 @@
             <!-- Contrôles Séries TV (Saisons & Épisodes) -->
             <div id="tv-controls-panel" class="tv-controls-panel" style="display: none;">
                 <div class="season-row">
-                    <label for="seasonSelect"><i class="fa-solid fa-list-ol"></i> Saison :</label>
+                    <label for="seasonSelect">Saison :</label>
                     <select id="seasonSelect" onchange="Nafy.Player.onSeasonChange(this.value)"></select>
                 </div>
                 
@@ -531,7 +513,7 @@
 
             <!-- Recommandations similaires -->
             <div class="player-similar-section">
-                <h3 class="section-subtitle-heading" style="font-size:1.2rem; margin-bottom:14px;"><i class="fa-solid fa-thumbs-up"></i> Vous pourriez aussi aimer</h3>
+                <h3 class="section-subtitle-heading" style="font-size:1.2rem; margin-bottom:14px;">Titres similaires</h3>
                 <div id="similarCarousel" class="media-carousel"></div>
             </div>
         </section>
@@ -591,13 +573,13 @@
             <!-- Onglets de la modale -->
             <div class="modal-tabs-header">
                 <button class="modal-tab-btn active" data-tab="synopsis" onclick="Nafy.UI.switchModalTab('synopsis')">
-                    <i class="fa-solid fa-circle-info"></i> Synopsis & Bande-annonce
+                    Synopsis
                 </button>
                 <button class="modal-tab-btn" data-tab="reviews" onclick="Nafy.UI.switchModalTab('reviews')">
-                    <i class="fa-solid fa-comments"></i> Avis spectateurs
+                    Avis spectateurs
                 </button>
                 <button class="modal-tab-btn" data-tab="providers" onclick="Nafy.UI.switchModalTab('providers')">
-                    <i class="fa-solid fa-tv"></i> Plateformes officielles
+                    Plateformes
                 </button>
             </div>
 
@@ -613,14 +595,14 @@
                             <p id="modalOverview" class="modal-overview">Description...</p>
                             
                             <div id="modalTrailerContainer" class="modal-trailer-wrapper" style="display:none;">
-                                <h3 style="font-size:1.1rem; margin-bottom:8px;"><i class="fa-brands fa-youtube" style="color:#e50914;"></i> Bande-annonce officielle</h3>
+                                <h3 style="font-size:1.1rem; margin-bottom:8px;">Bande-annonce officielle</h3>
                                 <div class="trailer-iframe-box">
                                     <iframe id="modalTrailerIframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                                 </div>
                             </div>
 
                             <h3 style="font-size:1.1rem; margin-bottom:8px; margin-top:16px;">
-                                Distribution principale <span style="font-size:0.75rem; color:var(--text-dim);">(cliquez sur un artiste pour voir sa filmographie)</span>
+                                Distribution
                             </h3>
                             <div id="modalCastList" class="modal-cast-grid"></div>
                         </div>
@@ -666,18 +648,18 @@
         <div class="modal-dialog" style="max-width: 580px;">
             <button class="modal-close-btn" onclick="Nafy.UI.closeSettingsModal()"><i class="fa-solid fa-xmark"></i></button>
             <div style="padding: 24px 30px; border-bottom: 1px solid var(--border-subtle);">
-                <h2 style="font-size:1.4rem; font-weight:800;"><i class="fa-solid fa-sliders" style="color:var(--primary); margin-right:8px;"></i> Mon Profil & Paramètres</h2>
+                <h2 style="font-size:1.35rem; font-weight:700;">Mon Profil & Paramètres</h2>
             </div>
             <div style="padding: 24px 30px;">
                 <!-- Statistiques de visionnage -->
                 <div class="settings-group">
-                    <div class="settings-label"><i class="fa-solid fa-chart-pie"></i> Mes Statistiques de visionnage</div>
+                    <div class="settings-label">Statistiques de visionnage</div>
                     <div id="settingsStatsBox"></div>
                 </div>
 
                 <!-- Thèmes -->
                 <div class="settings-group">
-                    <div class="settings-label"><i class="fa-solid fa-palette"></i> Couleur du thème</div>
+                    <div class="settings-label">Couleur d'accentuation</div>
                     <div class="theme-swatches">
                         <button class="theme-swatch active" data-theme="red" style="background:#e50914;" onclick="Nafy.UI.setTheme('red')" title="Rouge Cinéma"></button>
                         <button class="theme-swatch" data-theme="blue" style="background:#0ea5e9;" onclick="Nafy.UI.setTheme('blue')" title="Bleu Cyber"></button>
@@ -689,7 +671,7 @@
 
                 <!-- Raccourcis clavier -->
                 <div class="settings-group">
-                    <div class="settings-label"><i class="fa-regular fa-keyboard"></i> Raccourcis clavier (en lecture)</div>
+                    <div class="settings-label">Raccourcis clavier en lecture</div>
                     <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
                         <strong>F</strong> : Plein écran • <strong>L</strong> : Mode Cinéma • <strong>N</strong> : Épisode suivant • <strong>P</strong> : Épisode précédent • <strong>S</strong> : Changer de serveur
                     </p>
@@ -697,7 +679,7 @@
 
                 <!-- Sauvegarde & Restauration -->
                 <div class="settings-group">
-                    <div class="settings-label"><i class="fa-solid fa-database"></i> Sauvegarde de vos données</div>
+                    <div class="settings-label">Sauvegarde des données</div>
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Exportez vos favoris, notes et historique pour les transférer sur un autre appareil.</p>
                     <div style="display:flex; gap:10px;">
                         <button class="btn btn-secondary btn-sm" onclick="Nafy.Storage.exportData()"><i class="fa-solid fa-download"></i> Exporter en JSON</button>
@@ -710,7 +692,7 @@
 
                 <!-- Réinitialisation -->
                 <div class="settings-group">
-                    <div class="settings-label"><i class="fa-solid fa-trash-can"></i> Réinitialisation</div>
+                    <div class="settings-label">Gestion des données</div>
                     <button class="btn btn-ghost btn-sm" style="color:#ef4444;" onclick="if(confirm('Effacer tout votre historique de lecture ?')){ Nafy.Storage.clearHistory(); Nafy.App.renderResumeRow(); Nafy.UI.showToast('Historique effacé'); }">
                         <i class="fa-solid fa-clock-rotate-left"></i> Vider l'historique de lecture
                     </button>
@@ -733,10 +715,10 @@
                     <span class="logo-icon"><i class="fa-solid fa-play"></i></span>
                     <span class="logo-text">NAFY<span class="logo-accent">STREAM</span></span>
                 </div>
-                <p class="footer-tagline">Interface cinématique nouvelle génération propulsée par TMDb et les meilleurs lecteurs HD.</p>
+                <p class="footer-tagline">Votre plateforme de streaming pour explorer films, séries et sagas cinématographiques.</p>
             </div>
             <div class="footer-links">
-                <h4>Navigation rapide</h4>
+                <h4>Navigation</h4>
                 <a href="#home" onclick="Nafy.Router.navigate('home'); return false;">Accueil</a>
                 <a href="#movies" onclick="Nafy.Router.navigate('movies'); return false;">Films</a>
                 <a href="#series" onclick="Nafy.Router.navigate('series'); return false;">Séries</a>
@@ -749,7 +731,7 @@
                 <p class="footer-disclaimer">
                     Nafy Stream est une interface de découverte et d'indexation qui n'héberge aucun contenu sur ses serveurs. Les métadonnées sont fournies par <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">The Movie Database (TMDb)</a>.
                 </p>
-                <p class="copyright">&copy; 2026 Nafy Stream. Architecture modulaire PWA v2.6.0</p>
+                <p class="copyright">&copy; 2026 Nafy Stream. Tous droits réservés.</p>
             </div>
         </div>
     </footer>

@@ -62,42 +62,38 @@ button, input, select {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, rgba(180, 0, 0, 0.85) 100%);
+    background: var(--primary);
     color: #ffffff;
-    box-shadow: 0 4px 16px var(--primary-glow);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 22px var(--primary-glow);
+    background: var(--primary-hover);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.22);
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .btn-icon {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     color: var(--text-main);
     border: 1px solid var(--border-subtle);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 .btn-icon:hover {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.14);
     color: #ffffff;
-    transform: scale(1.08);
 }
 
 .btn-icon.active {

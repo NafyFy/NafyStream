@@ -117,21 +117,13 @@ Nafy.Player = {
         if (!box) return;
 
         const isAnime = this.isAnime(this.currentDetails);
-        const typeLabel = isAnime ? 'Animé' : (this.currentMediaType === 'tv' ? 'Série' : 'Film');
-        const audioLabel = this.preferredAudio === 'vf' ? 'VF (Français)' : 'VOSTFR (Sous-titres FR)';
+        const typeLabel = isAnime ? 'animé' : (this.currentMediaType === 'tv' ? 'série' : 'film');
+        const audioLabel = this.preferredAudio === 'vf' ? 'VF' : 'VOSTFR';
 
         box.innerHTML = `
-            <div class="player-rec-inner">
-                <div class="rec-icon-badge">
-                    <i class="fa-solid fa-crown"></i>
-                </div>
-                <div class="rec-content">
-                    <div class="rec-title">
-                        <span class="rec-highlight">${rec.badge}</span>
-                        <span>pour ce ${typeLabel} en ${audioLabel} : <strong>${rec.title}</strong></span>
-                    </div>
-                    <div class="rec-desc">${rec.reason}</div>
-                </div>
+            <div class="player-audio-hint">
+                <span class="hint-dot"></span>
+                <span class="hint-text">Source recommandée pour ce ${typeLabel} (${audioLabel}) : <strong>${rec.title}</strong> — ${rec.reason}</span>
             </div>
         `;
         box.style.display = 'block';
@@ -150,12 +142,8 @@ Nafy.Player = {
             btn.className = `server-btn ${this.currentServer === srv.id ? 'active' : ''} ${isRec ? 'is-recommended' : ''}`;
             
             btn.innerHTML = `
-                <i class="fa-solid ${srv.icon}"></i>
-                <div class="server-btn-info">
-                    <span class="server-btn-name">${srv.name}</span>
-                    <span class="server-btn-badge">${srv.tag || srv.badge}</span>
-                </div>
-                ${isRec ? '<span class="server-star-tag"><i class="fa-solid fa-star"></i> Recommandé</span>' : ''}
+                <span class="server-btn-name">${srv.name}</span>
+                ${isRec ? '<span class="server-pill-rec">Recommandé</span>' : ''}
             `;
 
             btn.onclick = () => {

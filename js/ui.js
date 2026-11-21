@@ -35,7 +35,7 @@ Nafy.UI = {
         const year = releaseDate ? releaseDate.substring(0, 4) : '—';
         const rating = item.vote_average ? item.vote_average.toFixed(1) : '—';
         const isTv = mediaType === 'tv';
-        const typeLabel = isTv ? 'SÉRIE' : 'FILM';
+        const typeLabel = isTv ? 'Série' : 'Film';
         
         const posterUrl = item.poster_path 
             ? `${Nafy.Config.TMDB_IMAGE_BASE}${item.poster_path}`
@@ -47,10 +47,6 @@ Nafy.UI = {
         card.innerHTML = `
             <div class="card-poster-wrapper">
                 <img src="${posterUrl}" alt="${this.escapeHtml(title)}" loading="lazy">
-                <div class="card-badges-top">
-                    <span class="card-rating-badge"><i class="fa-solid fa-star"></i> ${rating}</span>
-                    <span class="card-type-badge">${typeLabel}</span>
-                </div>
                 ${userRating > 0 ? `<div class="card-user-rating-badge"><i class="fa-solid fa-star"></i> ${userRating}/5</div>` : ''}
                 <button class="card-bookmark-btn ${isSaved ? 'saved' : ''}" title="${isSaved ? 'Retirer de Ma Liste' : 'Ajouter à Ma Liste'}" onclick="event.stopPropagation(); Nafy.UI.handleCardBookmark(this, ${item.id})">
                     <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
@@ -63,7 +59,9 @@ Nafy.UI = {
                 <h3 class="card-title" title="${this.escapeHtml(title)}">${this.escapeHtml(title)}</h3>
                 <div class="card-meta-line">
                     <span>${year}</span>
+                    <span class="meta-dot">•</span>
                     <span>${typeLabel}</span>
+                    ${rating !== '—' ? `<span class="meta-dot">•</span><span class="card-meta-rating"><i class="fa-solid fa-star"></i> ${rating}</span>` : ''}
                 </div>
             </div>
         `;
@@ -223,7 +221,7 @@ Nafy.UI = {
 
         container.style.display = 'flex';
         container.innerHTML = `
-            <span class="recent-title"><i class="fa-solid fa-clock-rotate-left"></i> Récents :</span>
+            <span class="recent-title">Recherches récentes :</span>
             <div class="recent-pills">
                 ${list.map(q => `
                     <button class="recent-pill" onclick="Nafy.Router.navigate('search/${encodeURIComponent(q)}')">
@@ -239,13 +237,13 @@ Nafy.UI = {
 
     // ================= SURPRENEZ-MOI (SHUFFLE ALÉATOIRE) =================
     async triggerRandomSurprise() {
-        this.showToast("🎲 Tirage au sort en cours...", "fa-dice");
+        this.showToast("Sélection d'un titre aléatoire...", "fa-shuffle");
         const title = await Nafy.Api.getRandomTitle(Math.random() > 0.4 ? 'movie' : 'tv');
         if (title) {
-            this.showToast(`✨ Sélectionné : ${title.title || title.name}`, "fa-sparkles");
+            this.showToast(`Titre sélectionné : ${title.title || title.name}`);
             this.openInfoModal(title.id, title.media_type || 'movie');
         } else {
-            this.showToast("Impossible de piocher un titre pour le moment", "fa-triangle-exclamation");
+            this.showToast("Impossible de piocher un titre pour le moment", "fa-circle-exclamation");
         }
     },
 
@@ -324,7 +322,7 @@ Nafy.UI = {
                 data.credits.cast.slice(0, 10).forEach(actor => {
                     const chip = document.createElement('button');
                     chip.className = 'cast-chip clickable';
-                    chip.innerHTML = `<i class="fa-solid fa-user" style="font-size:0.75rem; margin-right:4px;"></i> ${actor.name} <span class="cast-role">(${actor.character || 'Rôle'})</span>`;
+                    chip.innerHTML = `${actor.name} <span class="cast-role">${actor.character ? `(${actor.character})` : ''}</span>`;
                     chip.onclick = () => {
                         this.closeInfoModal();
                         Nafy.Router.navigate(`person/${actor.id}/${encodeURIComponent(actor.name)}`);
@@ -455,19 +453,19 @@ Nafy.UI = {
             <div class="stats-grid">
                 <div class="stat-card">
                     <span class="stat-num">${stats.moviesCount}</span>
-                    <span class="stat-title"><i class="fa-solid fa-film"></i> Films vus</span>
+                    <span class="stat-title">Films visionnés</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-num">${stats.episodesCount}</span>
-                    <span class="stat-title"><i class="fa-solid fa-tv"></i> Épisodes vus</span>
+                    <span class="stat-title">Épisodes vus</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-num">${stats.totalHoursFormatted}</span>
-                    <span class="stat-title"><i class="fa-solid fa-stopwatch"></i> Temps estimé</span>
+                    <span class="stat-title">Temps estimé</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-num">${stats.ratingsCount}</span>
-                    <span class="stat-title"><i class="fa-solid fa-star gold"></i> Titres notés</span>
+                    <span class="stat-title">Titres notés</span>
                 </div>
             </div>
         `;
